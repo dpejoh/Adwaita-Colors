@@ -1,5 +1,7 @@
 # Adwaita-colors
 
+![showcase](./Nautilus.png)
+
 Adwaita Colors enhances the Adwaita icon theme by integrating GNOME’s accent color feature, introduced in GNOME 47. This project ensures that your Adwaita icons reflect the same accent color as your GNOME theme, instead of the default blue, for a more cohesive and customized look.
 Motivation
 
