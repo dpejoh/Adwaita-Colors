@@ -5,6 +5,8 @@ Motivation
 
 GNOME 47 introduced a "color accent" feature to allow users to select a system-wide accent color. However, the default Adwaita icon theme does not automatically adapt to this accent color, leaving the icons in the default blue. Adwaita Colors fixes this by applying your chosen accent color to the icons.
 
+In addition, I added MoreWaita icon folders and made them themed to allow for more extensive customization.
+
 ## Installation:
 
 Clone the repository to your local machine:
