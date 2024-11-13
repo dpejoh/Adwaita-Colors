@@ -14,19 +14,19 @@ In addition, I added MoreWaita icon folders and made them themed to allow for mo
 Clone the repository to your local machine:
 
 ```sh
-git clone https://github.com/dpejoh/Adwaita-colors`
+git clone https://github.com/dpejoh/Adwaita-colors
 ```
 
 To install the icons for your user, copy the Adwaita-colors folder to:
 
 ```sh
-cp -r ./Adwaita-colors/* ~/.local/share/icons/`
+cp -r ./Adwaita-colors/* ~/.local/share/icons/
 ```
 
 To install the icons globally for all users, use:
 
 ```sh
-cp -r ./Adwaita-colors/* /usr/share/icons/`
+cp -r ./Adwaita-colors/* /usr/share/icons/
 ```
 Once the icons are installed and integrated, apply the theme through GNOME Tweaks.
 
