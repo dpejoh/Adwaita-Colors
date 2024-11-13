@@ -40,7 +40,7 @@ Once the icons are installed and integrated, apply the theme through GNOME Tweak
 
 ## Auto Match Adwaita-color with Accent Colors:
 
-To automatically match your color accent with the Adwaita theme, you can install the `auto-adwaita-colors` extension by [@celiopy](https://github.com/celiopy/auto-adwaita-colors).
+To automatically match your color accent with the Adwaita theme, you can install the "Auto Adwaita Colors" extension by [@celiopy](https://github.com/celiopy/auto-adwaita-colors).
 
 Clone the repository:
 
