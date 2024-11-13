@@ -49,7 +49,7 @@ To automatically match your color accent with the Adwaita theme, you can install
 
 You can install the extension directly from GNOME Shell Extensions:
 
-[<img src="./get-it-on-ge.png>](https://extensions.gnome.org/extension/7529/auto-adwaita-colors/)
+[<img src="https://micheleg.github.io/dash-to-dock/media/get-it-on-ego.png" height="100">](https://extensions.gnome.org/extension/7529/auto-adwaita-colors/)
 
 Or download the latest release from GitHub by running the following command:
 
