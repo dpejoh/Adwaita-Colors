@@ -23,7 +23,7 @@ To install the icons globally for all users, use:
 
 `cp -r ./Adwaita-colors/* /usr/share/icons/`
 
-### Integrating with MoreWaita
+### Integrating with MoreWaita:
 
 If you're using the MoreWaita theme, follow these steps to integrate it with Adwaita Colors:
 
@@ -34,7 +34,28 @@ In the index.theme file, add MoreWaita at the beginning of the Inherits= line:
 In the scalable directory, delete all icons except the folder icons and the gnome-tweaks icon (those that are already included in the MoreWaita icon set). This ensures there are no conflicts or duplicates.
 
 
-## Applying the Theme
+## Applying the Theme:
 
 Once the icons are installed and integrated, apply the theme through GNOME Tweaks.
 
+## Auto Match Adwaita-color with Accent Colors:
+
+To automatically match your color accent with the Adwaita theme, you can install the `auto-adwaita-colors` extension by [@celiopy](https://github.com/celiopy/auto-adwaita-colors).
+
+Clone the repository:
+
+`git clone https://github.com/celiopy/auto-adwaita-colors`
+
+Navigate into the directory:
+
+`cd auto-adwaita-colors`
+
+Zip the extension:
+
+`zip auto-adwaita-colors@celiopy.zip *`
+
+Install the extension using GNOME:
+
+`gnome-extensions install --force "auto-adwaita-colors@celiopy.zip"`
+
+After installation, open the GNOME Extensions Manager and enable the extension from there.
