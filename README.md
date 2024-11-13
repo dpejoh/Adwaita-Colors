@@ -47,7 +47,11 @@ To automatically match your color accent with the Adwaita theme, you can install
 
 ### Installation:
 
-Download the extension from the latest release, or run the following command:
+You can install the extension directly from GNOME Shell Extensions:
+
+[<img src="./get-it-on-ge.png>](https://extensions.gnome.org/extension/7529/auto-adwaita-colors/)
+
+Or download the latest release from GitHub by running the following command:
 
 ```sh
 wget https://github.com/celiopy/auto-adwaita-colors/releases/download/1.0/auto-adwaita-colors@celiopy.zip
