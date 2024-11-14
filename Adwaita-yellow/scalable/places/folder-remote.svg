@@ -127,7 +127,7 @@
        offset="0"
        stop-color="#62a0ea"
        id="stop28"
-       style="stop-color:#d4991c;stop-opacity:1;" />
+       style="stop-color:#cb931a;stop-opacity:1;" />
     <stop
        offset="0.0576991"
        stop-color="#afd4ff"
@@ -137,12 +137,12 @@
        offset="0.122204"
        stop-color="#62a0ea"
        id="stop32"
-       style="stop-color:#d4991c;stop-opacity:1;" />
+       style="stop-color:#cb931a;stop-opacity:1;" />
     <stop
        offset="0.87330598"
        stop-color="#62a0ea"
        id="stop34"
-       style="stop-color:#d4991c;stop-opacity:1;" />
+       style="stop-color:#cb931a;stop-opacity:1;" />
     <stop
        offset="0.95599699"
        stop-color="#c0d5ea"
@@ -152,13 +152,13 @@
        offset="1"
        stop-color="#62a0ea"
        id="stop38"
-       style="stop-color:#d4991c;stop-opacity:1;" />
+       style="stop-color:#cb931a;stop-opacity:1;" />
   </linearGradient>
   <path
      d="m 21.976562 12 c -5.527343 0 -9.976562 4.460938 -9.976562 10 v 76 c 0 5.539062 4.449219 10 9.976562 10 h 84.042969 c 5.53125 0 9.980469 -4.460938 9.980469 -10 v -64 c 0 -6.628906 -5.359375 -12 -11.972656 -12 h -46.027344 c -2.480469 0 -4.78125 -1.304688 -6.0625 -3.4375 l -0.84375 -1.410156 c -1.921875 -3.195313 -5.371094 -5.152344 -9.09375 -5.152344 z m 0 0"
      fill="#438de6"
      id="path41"
-     style="fill:#d4991c;fill-opacity:1" />
+     style="fill:#cb931a;fill-opacity:1" />
   <path
      d="m 68 117.210938 v -29.851563 h -8 v 29.851563 z m 0 0"
      fill="url(#a)"
