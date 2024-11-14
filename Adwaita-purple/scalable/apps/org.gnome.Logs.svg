@@ -1,0 +1,490 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   id="svg11300"
+   width="128"
+   height="128"
+   style="enable-background:new"
+   version="1.0"
+   viewBox="0 0 128 128"
+   sodipodi:docname="org.gnome.Logs.svg"
+   inkscape:version="1.2.2 (b0a8486541, 2022-12-01)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <sodipodi:namedview
+     id="namedview76"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     showgrid="false"
+     inkscape:zoom="1.9140625"
+     inkscape:cx="-133.74694"
+     inkscape:cy="25.338776"
+     inkscape:window-width="1536"
+     inkscape:window-height="795"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="g1479" />
+  <title
+     id="title4162">Adwaita Icon Template</title>
+  <defs
+     id="defs3">
+    <linearGradient
+       id="linearGradient1574"
+       x1="344"
+       x2="340"
+       y1="76"
+       y2="72"
+       gradientTransform="matrix(.25 0 0 .25 180 83)"
+       gradientUnits="userSpaceOnUse">
+      <stop
+         id="stop1347"
+         style="stop-color:#d5d3cf"
+         offset="0" />
+      <stop
+         id="stop1349-6"
+         style="stop-color:#fff"
+         offset="1" />
+    </linearGradient>
+    <clipPath
+       id="clipPath1609">
+      <path
+         id="path1611"
+         d="m252 116 28-28v-8h-36v36z"
+         style="fill:#e74747" />
+    </clipPath>
+    <linearGradient
+       id="linearGradient1572"
+       x1="256"
+       x2="256"
+       y1="268"
+       y2="-180"
+       gradientUnits="userSpaceOnUse">
+      <stop
+         id="stop1183"
+         style="stop-color:#eeeeec"
+         offset="0" />
+      <stop
+         id="stop1185"
+         style="stop-color:#fff"
+         offset="1" />
+    </linearGradient>
+  </defs>
+  <metadata
+     id="metadata4">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:creator>
+          <cc:Agent>
+            <dc:title>GNOME Design Team</dc:title>
+          </cc:Agent>
+        </dc:creator>
+        <dc:source />
+        <cc:license
+           rdf:resource="http://creativecommons.org/licenses/by-sa/4.0/" />
+        <dc:title>Adwaita Icon Template</dc:title>
+        <dc:subject>
+          <rdf:Bag />
+        </dc:subject>
+        <dc:date />
+        <dc:rights>
+          <cc:Agent>
+            <dc:title />
+          </cc:Agent>
+        </dc:rights>
+        <dc:publisher>
+          <cc:Agent>
+            <dc:title />
+          </cc:Agent>
+        </dc:publisher>
+        <dc:identifier />
+        <dc:relation />
+        <dc:language />
+        <dc:coverage />
+        <dc:description />
+        <dc:contributor>
+          <cc:Agent>
+            <dc:title />
+          </cc:Agent>
+        </dc:contributor>
+      </cc:Work>
+      <cc:License
+         rdf:about="http://creativecommons.org/licenses/by-sa/4.0/">
+        <cc:permits
+           rdf:resource="http://creativecommons.org/ns#Reproduction" />
+        <cc:permits
+           rdf:resource="http://creativecommons.org/ns#Distribution" />
+        <cc:requires
+           rdf:resource="http://creativecommons.org/ns#Notice" />
+        <cc:requires
+           rdf:resource="http://creativecommons.org/ns#Attribution" />
+        <cc:permits
+           rdf:resource="http://creativecommons.org/ns#DerivativeWorks" />
+        <cc:requires
+           rdf:resource="http://creativecommons.org/ns#ShareAlike" />
+      </cc:License>
+    </rdf:RDF>
+  </metadata>
+  <g
+     id="layer1"
+     transform="translate(0,-172)">
+    <g
+       id="layer2"
+       style="display:none">
+      <rect
+         id="rect13805"
+         x="9.2651e-8"
+         y="172"
+         width="128"
+         height="128"
+         style="display:inline;enable-background:accumulate;fill:#f0f0f0" />
+      <rect
+         id="rect859"
+         x="160"
+         y="172"
+         width="16"
+         height="16"
+         style="display:inline;enable-background:accumulate;fill:#f0f0f0" />
+      <text
+         id="text863"
+         y="164"
+         style="display:inline;enable-background:new;fill:#000000;font-family:Cantarell;font-size:4px;font-weight:bold;line-height:125%;stroke-width:.33265"
+         xml:space="preserve"><tspan
+           id="tspan861"
+           x="0"
+           y="164"
+           style="font-size:4px;stroke-width:.33265">Hicolor</tspan></text>
+      <text
+         id="text867"
+         x="160"
+         y="164"
+         style="display:inline;enable-background:new;fill:#000000;font-family:Cantarell;font-size:4px;font-weight:bold;line-height:125%;stroke-width:.33265"
+         xml:space="preserve"><tspan
+           id="tspan865"
+           x="160"
+           y="164"
+           style="font-size:4px;stroke-width:.33265">Symbolic</tspan></text>
+    </g>
+    <g
+       id="layer3"
+       style="display:none">
+      <circle
+         id="circle2892"
+         cx="64"
+         cy="236"
+         r="59.504"
+         style="display:inline;enable-background:new;fill:none;opacity:.1;paint-order:normal;stroke-dasharray:0.99000001, 0.99000001;stroke-width:.99;stroke:#000" />
+      <rect
+         id="rect2894"
+         x="20.495"
+         y="180.49"
+         width="87.01"
+         height="111.01"
+         rx="8.701"
+         ry="7.9293"
+         style="display:inline;enable-background:new;fill:none;opacity:.1;paint-order:normal;stroke-dasharray:0.99000001, 0.99000001;stroke-width:.99;stroke:#000" />
+      <rect
+         id="rect2896"
+         x="12.495"
+         y="184.5"
+         width="103.01"
+         height="103.01"
+         rx="7.9238"
+         ry="7.9238"
+         style="display:inline;enable-background:new;fill:none;opacity:.1;paint-order:normal;stroke-dasharray:0.99000001, 0.99000001;stroke-width:.99;stroke:#000" />
+      <rect
+         id="rect2898"
+         x="8.495"
+         y="200.49"
+         width="111.01"
+         height="87.01"
+         rx="7.9293"
+         ry="8.701"
+         style="display:inline;enable-background:new;fill:none;opacity:.1;paint-order:normal;stroke-dasharray:0.99000001, 0.99000001;stroke-width:.99;stroke:#000" />
+      <path
+         id="path2900"
+         d="m2.6203e-5 289h128"
+         style="display:inline;enable-background:new;fill:none;stroke-width:2;stroke:#62a0ea" />
+    </g>
+    <g
+       id="g1479"
+       transform="matrix(.3 0 0 -.2128 -12.8 247.36)"
+       style="enable-background:new;fill:url(#linearGradient1572);stroke-width:1.0299">
+      <rect
+         id="rect1473"
+         transform="scale(-1,1)"
+         x="-429.33"
+         y="-190.96"
+         width="346.67"
+         height="451.13"
+         rx="26.667"
+         ry="44.432"
+         style="fill:#702e85;paint-order:normal;fill-opacity:1" />
+      <rect
+         id="rect1475"
+         transform="scale(-1,1)"
+         x="-429.33"
+         y="-181.57"
+         width="346.67"
+         height="451.13"
+         rx="26.667"
+         ry="44.432"
+         style="fill:#d5d3cf;paint-order:normal" />
+      <rect
+         id="rect1477"
+         transform="scale(-1,1)"
+         x="-429.33"
+         y="-153.37"
+         width="346.67"
+         height="451.13"
+         rx="26.667"
+         ry="37.594"
+         style="fill:#f6f5f4;paint-order:normal" />
+    </g>
+    <g
+       id="g1497"
+       transform="translate(3.05e-6,3.3e-6)"
+       style="enable-background:new">
+      <circle
+         id="circle1481"
+         cx="108"
+         cy="252"
+         r="2"
+         style="fill:#d5d3cf" />
+      <circle
+         id="circle1483"
+         cx="108"
+         cy="242"
+         r="2"
+         style="fill:#d5d3cf" />
+      <circle
+         id="circle1485"
+         cx="108"
+         cy="232"
+         r="2"
+         style="fill:#d5d3cf" />
+      <circle
+         id="circle1487"
+         cx="108"
+         cy="222"
+         r="2"
+         style="fill:#d5d3cf" />
+      <circle
+         id="circle1489"
+         cx="108"
+         cy="212"
+         r="2"
+         style="fill:#d5d3cf" />
+      <circle
+         id="circle1493"
+         cx="108"
+         cy="202"
+         r="2"
+         style="fill:#d5d3cf" />
+      <circle
+         id="circle1495"
+         cx="108"
+         cy="192"
+         r="2"
+         style="fill:#d5d3cf" />
+    </g>
+    <g
+       id="g1518"
+       transform="translate(3.05e-6,3.3e-6)"
+       style="enable-background:new">
+      <circle
+         id="circle1499"
+         cx="20"
+         cy="272"
+         r="2"
+         style="fill:#d5d3cf" />
+      <circle
+         id="circle1501"
+         cx="20"
+         cy="262"
+         r="2"
+         style="fill:#d5d3cf" />
+      <circle
+         id="circle1503"
+         cx="20"
+         cy="252"
+         r="2"
+         style="fill:#d5d3cf" />
+      <circle
+         id="circle1505"
+         cx="20"
+         cy="242"
+         r="2"
+         style="fill:#d5d3cf" />
+      <circle
+         id="circle1507"
+         cx="20"
+         cy="232"
+         r="2"
+         style="fill:#d5d3cf" />
+      <circle
+         id="circle1509"
+         cx="20"
+         cy="222"
+         r="2"
+         style="fill:#d5d3cf" />
+      <circle
+         id="circle1511"
+         cx="20"
+         cy="212"
+         r="2"
+         style="fill:#d5d3cf" />
+      <circle
+         id="circle1513"
+         cx="20"
+         cy="202"
+         r="2"
+         style="fill:#d5d3cf" />
+      <circle
+         id="circle1515"
+         cx="20"
+         cy="192"
+         r="2"
+         style="fill:#d5d3cf" />
+    </g>
+    <g
+       id="g1538"
+       transform="translate(3.05e-6 -1)"
+       style="enable-background:new;opacity:.3;stroke:#d5d3cf">
+      <path
+         id="path1520"
+         d="m28 192h72"
+         style="fill:none;stroke-width:2;stroke:#d5d3cf" />
+      <path
+         id="path1522"
+         d="m28 202h72"
+         style="fill:none;stroke-width:2;stroke:#d5d3cf" />
+      <path
+         id="path1524"
+         d="m28 212h72"
+         style="fill:none;stroke-width:2;stroke:#d5d3cf" />
+      <path
+         id="path1526"
+         d="m28 222h72"
+         style="fill:none;stroke-width:2;stroke:#d5d3cf" />
+      <path
+         id="path1528"
+         d="m28 232h72"
+         style="fill:none;stroke-width:2;stroke:#d5d3cf" />
+      <path
+         id="path1530"
+         d="m28 242h72"
+         style="fill:none;stroke-width:2;stroke:#d5d3cf" />
+      <path
+         id="path1532"
+         d="m28 252h72"
+         style="fill:none;stroke-width:2;stroke:#d5d3cf" />
+      <path
+         id="path1534"
+         d="m28 262h72"
+         style="fill:none;stroke-width:2;stroke:#d5d3cf" />
+      <path
+         id="path1536"
+         d="m28 272h66"
+         style="fill:none;stroke-width:2;stroke:#d5d3cf" />
+    </g>
+    <g
+       id="g1568"
+       transform="translate(-20 3.3e-6)"
+       style="enable-background:new">
+      <g
+         id="g1546"
+         transform="translate(14 -12)"
+         style="opacity:.1;stroke:#00000f">
+        <path
+           id="path1540"
+           transform="translate(0,-3e-6)"
+           d="m36 250-8 8"
+           style="enable-background:new;fill:none;stroke-width:6;stroke:#00000f" />
+        <path
+           id="path1542"
+           transform="translate(0,-3e-6)"
+           d="m28 258-14 14"
+           style="enable-background:new;fill:none;stroke-linecap:round;stroke-width:12;stroke:#00000f" />
+        <circle
+           id="circle1544"
+           cx="58"
+           cy="228"
+           r="30.118"
+           style="fill:none;opacity:1;stroke-linejoin:round;stroke-width:3.7647;stroke:#00000f" />
+      </g>
+      <g
+         id="g1558"
+         transform="translate(14 -14)"
+         style="enable-background:new">
+        <path
+           id="path1548"
+           d="m11.89 268.55 15.457-15.457"
+           style="enable-background:new;fill:none;opacity:.154;stroke-linecap:round;stroke-width:1.6378;stroke:#fff" />
+        <path
+           id="path1550"
+           d="m36 250-8 8"
+           style="fill:none;stroke-width:6;stroke:#949390" />
+        <path
+           id="path1552"
+           d="m36 248-8 8"
+           style="fill:none;stroke-width:6;stroke:#d5d3cf" />
+        <path
+           id="path1554"
+           d="m28 258-14 14"
+           style="fill:none;stroke-linecap:round;stroke-width:12;stroke:#241f31" />
+        <path
+           id="path1556"
+           d="m28 256-14 14"
+           style="fill:none;stroke-linecap:round;stroke-width:12;stroke:#424048" />
+      </g>
+      <circle
+         id="circle1560"
+         transform="scale(-1,1)"
+         cx="-72"
+         cy="212.06"
+         r="29.938"
+         style="enable-background:new;fill:#fff;opacity:.5" />
+      <circle
+         id="circle1562"
+         cx="72"
+         cy="214"
+         r="30.118"
+         style="fill:none;stroke-linejoin:round;stroke-width:3.7647;stroke:#702e85;stroke-opacity:1" />
+      <circle
+         id="circle1564"
+         style="fill:none;stroke-linejoin:round;stroke-width:3.7647;stroke:#ba7ece;stroke-opacity:1"
+         r="30.118"
+         cy="212"
+         cx="72" />
+      <path
+         id="path1566"
+         d="m25 255 16-16"
+         style="enable-background:new;fill:none;opacity:.154;stroke-linecap:round;stroke-width:2;stroke:#fff" />
+    </g>
+    <rect
+       id="rect1570"
+       transform="matrix(0,1,1,0,3.05e-6,3.3e-6)"
+       x="252"
+       y="88"
+       width="36"
+       height="36"
+       rx="8"
+       ry="8"
+       clip-path="url(#clipPath1609)"
+       style="enable-background:new;fill:url(#linearGradient1574);paint-order:normal" />
+  </g>
+</svg>
