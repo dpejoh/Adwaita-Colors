@@ -21,27 +21,27 @@
     <linearGradient
        id="linearGradient2023">
       <stop
-         style="stop-color:#8d55b9;stop-opacity:1;"
+         style="stop-color:#954ab5;stop-opacity:1;"
          offset="0"
          id="stop2019" />
       <stop
-         style="stop-color:#8d55b9;stop-opacity:1;"
+         style="stop-color:#954ab5;stop-opacity:1;"
          offset="0.05769911"
          id="stop2795" />
       <stop
-         style="stop-color:#8d55b9;stop-opacity:1;"
+         style="stop-color:#954ab5;stop-opacity:1;"
          offset="0.12220427"
          id="stop2797" />
       <stop
-         style="stop-color:#8d55b9;stop-opacity:1;"
+         style="stop-color:#954ab5;stop-opacity:1;"
          offset="0.87330586"
          id="stop2793" />
       <stop
-         style="stop-color:#dcb2e0;stop-opacity:1;"
+         style="stop-color:#d099d6;stop-opacity:1;"
          offset="0.95599729"
          id="stop2791" />
       <stop
-         style="stop-color:#8d55b9;stop-opacity:1;"
+         style="stop-color:#954ab5;stop-opacity:1;"
          offset="1"
          id="stop2021" />
     </linearGradient>
@@ -108,7 +108,7 @@
      transform="matrix(0.45451006,0,0,0.45552152,-1210.2921,616.15659)">
     <path
        id="rect1135"
-       style="fill:#8d55b9;fill-opacity:1;stroke-width:8.79091;stroke-linecap:round;stop-color:#000000"
+       style="fill:#954ab5;fill-opacity:1;stroke-width:8.79091;stroke-linecap:round;stop-color:#000000"
        d="m 2711.2064,-1326.3316 c -12.1618,0 -21.9544,9.791 -21.9544,21.9528 v 188.867 c 0,12.1618 9.7926,21.9528 21.9544,21.9528 h 184.9089 c 12.1619,0 21.9545,-9.791 21.9545,-21.9528 v -158.2547 a 26.343462,26.343462 45 0 0 -26.3435,-26.3435 h -101.2664 a 14.283764,14.283764 31.638659 0 1 -12.7581,-7.8607 l -3.3076,-6.5699 a 21.425501,21.425501 31.638659 0 0 -19.1371,-11.791 z" />
     <path
        id="path1953"
@@ -116,17 +116,17 @@
        d="m 2808.014,-1273.6447 c -6.0429,0 -11.5016,2.4179 -15.4646,6.3426 -5.0031,4.9549 -11.8483,11.2197 -18.9936,11.2197 h -62.3494 c -12.1618,0 -21.9544,9.791 -21.9544,21.9528 v 118.6179 c 0,12.1618 9.7926,21.9528 21.9544,21.9528 h 184.9089 c 12.1619,0 21.9545,-9.791 21.9545,-21.9528 v -105.4461 -13.1718 -17.5623 c 0,-12.1618 -9.7926,-21.9528 -21.9545,-21.9528 z" />
     <path
        id="rect1586"
-       style="fill:#dcb2e0;fill-opacity:1;stroke-width:8.79091;stroke-linecap:round;stop-color:#000000"
+       style="fill:#d099d6;fill-opacity:1;stroke-width:8.79091;stroke-linecap:round;stop-color:#000000"
        d="m 2808.014,-1282.4259 c -6.0429,0 -11.5016,2.4179 -15.4646,6.3426 -5.0031,4.9549 -11.8483,11.2197 -18.9936,11.2197 h -62.3494 c -12.1618,0 -21.9544,9.791 -21.9544,21.9528 v 122.8867 c 0,12.1618 9.7926,21.9528 21.9544,21.9528 h 184.9089 c 12.1619,0 21.9545,-9.791 21.9545,-21.9528 v -109.7149 -13.1718 -17.5623 c 0,-12.1618 -9.7926,-21.9528 -21.9545,-21.9528 z" />
   </g>
   <g
      aria-label="C"
      id="text1719"
-     style="font-weight:bold;font-size:123.472px;font-family:'Neue Haas Grotesk Text Pro';-inkscape-font-specification:'Neue Haas Grotesk Text Pro Bold';fill:#8d55b9;fill-opacity:1;stroke-width:0.264583"
+     style="font-weight:bold;font-size:123.472px;font-family:'Neue Haas Grotesk Text Pro';-inkscape-font-specification:'Neue Haas Grotesk Text Pro Bold';fill:#954ab5;fill-opacity:1;stroke-width:0.264583"
      transform="matrix(0.34191038,0,0,0.34191038,9.2493396,27.130681)">
     <path
        d="m 204.33454,132.38818 c -2.34597,-22.84232 -17.53303,-36.300767 -44.69687,-36.300767 -24.81787,0 -44.32644,17.903437 -44.32644,46.672417 0,28.89245 17.77996,46.91936 47.1663,46.91936 23.45968,0 39.88146,-13.82886 42.47437,-36.79466 h -28.02815 c -1.11124,8.51957 -5.55624,15.06359 -14.94011,15.06359 -14.81664,0 -17.53302,-11.72984 -17.53302,-24.20051 0,-17.16261 6.1736,-25.92912 16.42177,-25.92912 9.13693,0 14.94012,5.30929 15.80442,14.56969 z"
-       style="font-weight:900;font-family:'Helvetica LT Std';-inkscape-font-specification:'Helvetica LT Std Heavy';fill:#8d55b9;fill-opacity:1"
+       style="font-weight:900;font-family:'Helvetica LT Std';-inkscape-font-specification:'Helvetica LT Std Heavy';fill:#954ab5;fill-opacity:1"
        id="path1771" />
   </g>
 </svg>
