@@ -33,11 +33,9 @@ For immutable distros like Fedora Silverblue, the global installation is differe
 cp -r ./Adwaita-colors/* /var/usrlocal/share/icons/
 ```
 
-Once the icons are installed and integrated, apply the theme through GNOME Tweaks.
+Once the icons are installed, apply the theme through GNOME Tweaks.
 
 ## Integrating with MoreWaita:
-
-If you're using the MoreWaita theme, follow these steps to integrate it with Adwaita Colors:
 
 In the index.theme file, add MoreWaita at the beginning of the Inherits= line:
 
