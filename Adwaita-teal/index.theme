@@ -1,8 +1,8 @@
 [Icon Theme]
-Name=Adwaita-orange
+Name=Adwaita-teal
 Comment=The Only One
 Example=folder
-Inherits=Adwaita,AdwaitaLegacy,hicolor
+Inherits=MoreWaita,Adwaita,AdwaitaLegacy,hicolor
 Hidden=true
 
 # KDE Specific Stuff

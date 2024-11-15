@@ -33,7 +33,6 @@ For immutable distros like Fedora Silverblue, the global installation is differe
 cp -r ./Adwaita-colors/* /var/usrlocal/share/icons/
 ```
 
-
 #### Arch Linux (AUR) packages
 
 Release-based [adwaita-colors-icon-theme](https://aur.archlinux.org/packages/adwaita-colors-icon-theme):  
@@ -51,15 +50,6 @@ paru adwaita-colors-icon-theme-git
 > [!TIP]
 > Once the icons are installed, apply the theme through GNOME Tweaks.
 
-## Integrating with MoreWaita:
-
-In the index.theme file, add MoreWaita at the beginning of the Inherits= line:
-
-`Inherits=MoreWaita,Adwaita`  
-> [!NOTE]
-> Arch Linux AUR packages integrate with MoreWaita automatically.
-
-
 ## Auto Match Adwaita-color with Accent Colors:
 
 To automatically match your color accent with the Adwaita theme, you can install the "Auto Adwaita Colors" extension by [@celiopy](https://github.com/celiopy/auto-adwaita-colors).
@@ -73,7 +63,7 @@ You can install the extension directly from GNOME Shell Extensions:
 Or download the latest release from GitHub by running the following command:
 
 ```sh
-wget https://github.com/celiopy/auto-adwaita-colors/releases/download/1.0/auto-adwaita-colors@celiopy.zip
+wget https://github.com/celiopy/auto-adwaita-colors/releases/download/3.0/auto-adwaita-colors@celiopy.zip
 ```
 
 Install the extension using GNOME:
