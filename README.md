@@ -50,6 +50,10 @@ paru adwaita-colors-icon-theme-git
 > [!TIP]
 > Once the icons are installed, apply the theme through GNOME Tweaks.
 
+## MoreWaita:
+
+MoreWaita is now included in Adwaita-colors by default, allowing Adwaita-colors to fall back to it instead of the default Adwaita theme.
+
 ## Auto Match Adwaita-color with Accent Colors:
 
 To automatically match your color accent with the Adwaita theme, you can install the "Auto Adwaita Colors" extension by [@celiopy](https://github.com/celiopy/auto-adwaita-colors).
