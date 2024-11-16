@@ -52,7 +52,20 @@ paru adwaita-colors-icon-theme-git
 
 ## MoreWaita:
 
-MoreWaita is now included in Adwaita-colors by default, allowing Adwaita-colors to fall back to it instead of the default Adwaita theme.
+To install MoreWaita with Adwaita-colors:
+
+- Run MoreWaita.sh after cloning the repository, or run command below directly.
+- Use sudo for system-wide installation or on immutable distributions.
+
+#### Without sudo:
+
+```sh
+wget -O MoreWaita.sh https://raw.githubusercontent.com/dpejoh/Adwaita-colors/main/MoreWaita.sh && chmod +x MoreWaita.sh && ./MoreWaita.sh
+```
+#### With sudo:
+```sh
+wget -O MoreWaita.sh https://raw.githubusercontent.com/dpejoh/Adwaita-colors/main/MoreWaita.sh && chmod +x MoreWaita.sh && sudo ./MoreWaita.sh
+```
 
 ## Auto Match Adwaita-color with Accent Colors:
 

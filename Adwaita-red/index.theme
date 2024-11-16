@@ -2,7 +2,7 @@
 Name=Adwaita-red
 Comment=The Only One
 Example=folder
-Inherits=MoreWaita,Adwaita,AdwaitaLegacy,hicolor
+Inherits=Adwaita,AdwaitaLegacy,hicolor
 Hidden=true
 
 # KDE Specific Stuff
