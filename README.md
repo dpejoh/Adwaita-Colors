@@ -67,6 +67,9 @@ wget -O MoreWaita.sh https://raw.githubusercontent.com/dpejoh/Adwaita-colors/mai
 wget -O MoreWaita.sh https://raw.githubusercontent.com/dpejoh/Adwaita-colors/main/MoreWaita.sh && chmod +x MoreWaita.sh && sudo ./MoreWaita.sh
 ```
 
+> [!NOTE]
+> Arch Linux AUR packages integrate with MoreWaita automatically.
+
 ## Auto Match Adwaita-color with Accent Colors:
 
 To automatically match your color accent with the Adwaita theme, you can install the "Auto Adwaita Colors" extension by [@celiopy](https://github.com/celiopy/auto-adwaita-colors).
