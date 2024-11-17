@@ -54,6 +54,7 @@ paru adwaita-colors-icon-theme-git
 
 To install MoreWaita with Adwaita-colors:
 
+- Ensure that MoreWaita is installed.
 - Run MoreWaita.sh after cloning the repository, or run command below directly.
 - Use sudo for system-wide installation or on immutable distributions.
 
@@ -68,8 +69,8 @@ wget -O MoreWaita.sh https://raw.githubusercontent.com/dpejoh/Adwaita-colors/mai
 ```
 
 > [!NOTE]
+ 
 > Arch Linux AUR packages integrate with MoreWaita automatically.
-
 ## Auto Match Adwaita-color with Accent Colors:
 
 To automatically match your color accent with the Adwaita theme, you can install the "Auto Adwaita Colors" extension by [@celiopy](https://github.com/celiopy/auto-adwaita-colors).
