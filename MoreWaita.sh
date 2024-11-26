@@ -11,9 +11,9 @@ check_dir() {
 
 # Detect MoreWaita and Adwaita-colors locations
 possible_paths=(
-    "/var/usrlocal/share/icons"
     "/usr/share/icons"
     "/usr/local/share/icons"
+    "/var/usrlocal/share/icons"
     "$HOME/.local/share/icons"
     "$HOME/.icons"
 )
