@@ -13,7 +13,9 @@ check_dir() {
 possible_paths=(
     "/var/usrlocal/share/icons"
     "/usr/share/icons"
+    "/usr/local/share/icons"
     "$HOME/.local/share/icons"
+    "$HOME/.icons"
 )
 
 # Initialize variables
