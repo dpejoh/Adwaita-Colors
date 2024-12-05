@@ -10,19 +10,19 @@ In addition, I added MoreWaita icon folders and made them themed to allow for mo
 
 ## Installation:
 
+### Requirements:
+
+This theme will not work properly without the original Adwaita icon theme.
+
+### Regular installation:
+
 Clone the repository to your local machine:
 
 ```sh
 git clone https://github.com/dpejoh/Adwaita-colors
 ```
 
-To install the icons for your user, copy the Adwaita-colors folder to:
-
-```sh
-cp -r ./Adwaita-colors/* ~/.local/share/icons/
-```
-
-To install the icons globally for all users, use:
+To install the icons globally, simply run:
 
 ```sh
 cp -r ./Adwaita-colors/* /usr/share/icons/
@@ -32,8 +32,32 @@ For immutable distros like Fedora Silverblue, the global installation is differe
 ```sh
 cp -r ./Adwaita-colors/* /var/usrlocal/share/icons/
 ```
+### Install with package manager:
 
-#### Arch Linux (AUR) packages
+From v2.4.1, a .deb and .rpm packages is available on [GitHub latest release](https://github.com/dpejoh/Adwaita-colors/releases/tag/v2.4.1)
+
+### Ubuntu, Debian-based distros:
+
+Download the latest version from GitHub:
+```sh
+wget https://github.com/dpejoh/Adwaita-colors/releases/download/v2.4.1/adwaita-colors-theme-2.4.1.deb
+```
+Install it:
+```sh
+sudo dpkg -i adwaita-colors-theme-2.4.1.deb
+```
+### Fedora, CentOS and RHEL:
+
+Download the latest version from GitHub:
+```sh
+wget https://github.com/dpejoh/Adwaita-colors/releases/download/v2.4.1/adwaita-colors-theme-2.4.1.rpm
+```
+Install it:
+```sh
+sudo dnf install adwaita-colors-theme-2.4.1.rpm
+```
+
+### Arch Linux (AUR):
 
 Release-based [adwaita-colors-icon-theme](https://aur.archlinux.org/packages/adwaita-colors-icon-theme):  
 ```sh
@@ -55,14 +79,8 @@ paru adwaita-colors-icon-theme-git
 To install MoreWaita with Adwaita-colors:
 
 - Ensure that MoreWaita is installed.
-- Run MoreWaita.sh after cloning the repository, or run command below directly.
-- Use sudo for system-wide installation or on immutable distributions.
+- Run MoreWaita.sh after cloning the repository, or run command below directly:
 
-#### Without sudo:
-
-```sh
-wget -O MoreWaita.sh https://raw.githubusercontent.com/dpejoh/Adwaita-colors/main/MoreWaita.sh && chmod +x MoreWaita.sh && ./MoreWaita.sh
-```
 #### With sudo:
 ```sh
 wget -O MoreWaita.sh https://raw.githubusercontent.com/dpejoh/Adwaita-colors/main/MoreWaita.sh && chmod +x MoreWaita.sh && sudo ./MoreWaita.sh
