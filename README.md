@@ -14,7 +14,7 @@ In addition, I added MoreWaita icon folders and made them themed to allow for mo
 
 This theme will not work properly without the original Adwaita icon theme.
 
-### Regular installation:
+### Regular installation (Recommended & Updated):
 
 Clone the repository to your local machine:
 
@@ -32,6 +32,13 @@ For immutable distros like Fedora Silverblue, the global installation is differe
 ```sh
 cp -r ./Adwaita-colors/* /var/usrlocal/share/icons/
 ```
+For removing the icon theme run:
+```sh
+sudo rm -rf /usr/share/icons/Adwaita-*
+```
+> [!NOTE]
+> You can also install the icon theme in the user directory without any problems, but for best compatibility with apps, it is recommended to install it system-wide.
+
 ### Install with package manager:
 
 From v2.4.1, a .deb and .rpm packages is available on [GitHub latest release](https://github.com/dpejoh/Adwaita-colors/releases/tag/v2.4.1)
