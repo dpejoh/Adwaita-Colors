@@ -1,0 +1,339 @@
+#!/bin/bash
+
+# Default values
+PREFIX=""
+INSTALL=false
+UNINSTALL=false
+HELP=false
+
+# Help message
+show_help() {
+    cat << EOF
+Usage: $0 [OPTIONS]
+
+Install or remove Adwaita-colors icons.
+
+OPTIONS:
+    -i, --install           Install the icons
+    -u, --uninstall         Remove the icons
+    -P, --prefix=PATH       Specify installation prefix
+                            Default locations:
+                            - User install: ~/.local/share/icons
+                            - System install: /usr/share/icons
+                            Examples:
+                            -P /usr      → /usr/share/icons
+                            -P /app      → /app/share/icons
+                            -P ~/.local  → ~/.local/share/icons
+    -h, --help             Show this help message
+
+EXAMPLES:
+    $0 -i
+        Install icons to default location
+    
+    $0 -i -P /usr
+        Install icons to /usr/share/icons (system-wide)
+    
+    $0 -i -P /app
+        Install icons to /app/share/icons
+    
+    $0 -u -P /usr
+        Remove icons from /usr/share/icons
+    
+    $0 -u
+        Remove icons from default location
+
+NOTES:
+    - System-wide installations may require sudo privileges
+    - The script will create the icons directory if it doesn't exist
+    - Icon cache will be updated after installation/removal
+EOF
+}
+
+# Parse command line arguments
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        -i|--install)
+            INSTALL=true
+            shift
+            ;;
+        -u|--uninstall)
+            UNINSTALL=true
+            shift
+            ;;
+        -P|--prefix)
+            if [[ -n "$2" && "$2" != -* ]]; then
+                PREFIX="$2"
+                shift 2
+            else
+                echo "Error: --prefix requires an argument."
+                exit 1
+            fi
+            ;;
+        -P=*|--prefix=*)
+            PREFIX="${1#*=}"
+            shift
+            ;;
+        -h|--help)
+            HELP=true
+            shift
+            ;;
+        *)
+            echo "Unknown option: $1"
+            echo "Use -h or --help for usage information."
+            exit 1
+            ;;
+    esac
+done
+
+# Show help if requested
+if [[ "$HELP" == true ]]; then
+    show_help
+    exit 0
+fi
+
+# Validate options
+if [[ "$INSTALL" == false && "$UNINSTALL" == false ]]; then
+    echo "Error: Either -i/--install or -u/--uninstall must be specified."
+    echo "Use -h or --help for usage information."
+    exit 1
+fi
+
+if [[ "$INSTALL" == true && "$UNINSTALL" == true ]]; then
+    echo "Error: Cannot use both -i/--install and -u/--uninstall."
+    echo "Use -h or --help for usage information."
+    exit 1
+fi
+
+# Function to determine full path based on prefix
+get_full_path() {
+    local prefix="$1"
+    
+    # Handle empty prefix (default behavior)
+    if [[ -z "$prefix" ]]; then
+        if [[ "$INSTALL" == true ]]; then
+            # Default install: check if running as root for system vs user install
+            if [[ $EUID -eq 0 ]] || [[ -w "/usr/share" ]]; then
+                echo "/usr/share/icons"
+            else
+                echo "$HOME/.local/share/icons"
+            fi
+        else
+            # Default uninstall: check common locations
+            if [[ -d "/usr/share/icons" ]] && [[ $(find /usr/share/icons -name "Adwaita-*" -print -quit 2>/dev/null) ]]; then
+                echo "/usr/share/icons"
+            elif [[ -d "$HOME/.local/share/icons" ]] && [[ $(find "$HOME/.local/share/icons" -name "Adwaita-*" -print -quit 2>/dev/null) ]]; then
+                echo "$HOME/.local/share/icons"
+            else
+                echo "$HOME/.local/share/icons"
+            fi
+        fi
+        return
+    fi
+    
+    # Expand ~ to $HOME if present
+    prefix="${prefix/#\~/$HOME}"
+    
+    # Handle special cases
+    if [[ "$prefix" == "/" ]]; then
+        echo "/usr/share/icons"
+    else
+        # General case: {prefix}/share/icons
+        echo "${prefix}/share/icons"
+    fi
+}
+
+# Get the full installation path
+FULL_PATH=$(get_full_path "$PREFIX")
+
+# Function to check if we need sudo
+need_sudo() {
+    local path="$1"
+    if [[ -w "$(dirname "$path")" ]]; then
+        return 1  # false - no sudo needed
+    else
+        return 0  # true - sudo needed
+    fi
+}
+
+# Function to update icon cache
+update_icon_cache() {
+    local path="$1"
+    echo "Updating icon cache for: $path"
+    
+    if need_sudo "$path"; then
+        # For system-wide installations, try different cache update commands
+        if command -v gtk-update-icon-cache &> /dev/null; then
+            sudo gtk-update-icon-cache -f "$path" 2>/dev/null || true
+        elif command -v xdg-icon-resource &> /dev/null; then
+            sudo xdg-icon-resource forceupdate 2>/dev/null || true
+        else
+            echo "Warning: No icon cache update command found. Cache may not be updated."
+        fi
+    else
+        # For user installations
+        if command -v gtk-update-icon-cache &> /dev/null; then
+            gtk-update-icon-cache -f "$path" 2>/dev/null || true
+        elif command -v xdg-icon-resource &> /dev/null; then
+            xdg-icon-resource forceupdate 2>/dev/null || true
+        else
+            # Try flatpak update if available
+            if command -v flatpak &> /dev/null; then
+                flatpak update --appstream 2>/dev/null || true
+            fi
+        fi
+    fi
+}
+
+# Function to install icons
+install_icons() {
+    echo "Installing icons to: $FULL_PATH"
+    
+    # Check if Adwaita-* directories exist
+    local adwaita_dirs=()
+    while IFS= read -r -d '' dir; do
+        adwaita_dirs+=("$(basename "$dir")")
+    done < <(find . -maxdepth 1 -type d -name "Adwaita-*" -print0 2>/dev/null)
+    
+    if [[ ${#adwaita_dirs[@]} -eq 0 ]]; then
+        echo "Error: No Adwaita-* theme directories found in current directory."
+        echo "Please run this script from the root of the repository."
+        exit 1
+    fi
+    
+    echo "Found ${#adwaita_dirs[@]} Adwaita theme directories to install."
+    
+    # Create target directory
+    if need_sudo "$FULL_PATH"; then
+        echo "Creating directory (requires sudo)..."
+        sudo mkdir -p "$FULL_PATH"
+    else
+        mkdir -p "$FULL_PATH"
+    fi
+    
+    # Copy icons
+    local success_count=0
+    if need_sudo "$FULL_PATH"; then
+        echo "Copying icons (requires sudo)..."
+        for dir in "${adwaita_dirs[@]}"; do
+            echo "Installing: $dir"
+            sudo cp -r "./$dir" "$FULL_PATH/"
+            if [[ $? -eq 0 ]]; then
+                ((success_count++))
+            fi
+        done
+    else
+        for dir in "${adwaita_dirs[@]}"; do
+            echo "Installing: $dir"
+            cp -r "./$dir" "$FULL_PATH/"
+            if [[ $? -eq 0 ]]; then
+                ((success_count++))
+            fi
+        done
+    fi
+    
+    if [[ $success_count -eq ${#adwaita_dirs[@]} ]]; then
+        echo "Successfully installed $success_count/${#adwaita_dirs[@]} icon themes to: $FULL_PATH"
+    else
+        echo "Warning: Only installed $success_count/${#adwaita_dirs[@]} icon themes."
+        echo "Some installations may have failed."
+    fi
+    
+    # Update icon cache
+    update_icon_cache "$FULL_PATH"
+    echo "Icon installation completed."
+}
+
+# Function to uninstall icons
+uninstall_icons() {
+    echo "Removing icons from: $FULL_PATH"
+    
+    # Check if directory exists
+    if [[ ! -d "$FULL_PATH" ]]; then
+        echo "Warning: Directory does not exist: $FULL_PATH"
+        return 0
+    fi
+    
+    # Find and remove Adwaita-* directories
+    local removed_count=0
+    
+    if need_sudo "$FULL_PATH"; then
+        # List directories to remove
+        local dirs_to_remove=()
+        while IFS= read -r -d '' dir; do
+            dirs_to_remove+=("$dir")
+        done < <(sudo find "$FULL_PATH" -maxdepth 1 -type d -name "Adwaita-*" -print0 2>/dev/null)
+        
+        if [[ ${#dirs_to_remove[@]} -eq 0 ]]; then
+            echo "No Adwaita-* directories found in: $FULL_PATH"
+            # Update cache even if no directories found (to clean up any stale cache)
+            update_icon_cache "$FULL_PATH"
+            return 0
+        fi
+        
+        echo "The following directories will be removed:"
+        for dir in "${dirs_to_remove[@]}"; do
+            echo "  $(basename "$dir")"
+        done
+        
+        read -p "Continue? (y/N): " -n 1 -r
+        echo
+        if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+            echo "Uninstall cancelled."
+            return 0
+        fi
+        
+        # Remove directories
+        for dir in "${dirs_to_remove[@]}"; do
+            echo "Removing: $(basename "$dir")"
+            sudo rm -rf "$dir"
+            ((removed_count++))
+        done
+    else
+        # List directories to remove
+        local dirs_to_remove=()
+        while IFS= read -r -d '' dir; do
+            dirs_to_remove+=("$dir")
+        done < <(find "$FULL_PATH" -maxdepth 1 -type d -name "Adwaita-*" -print0 2>/dev/null)
+        
+        if [[ ${#dirs_to_remove[@]} -eq 0 ]]; then
+            echo "No Adwaita-* directories found in: $FULL_PATH"
+            # Update cache even if no directories found (to clean up any stale cache)
+            update_icon_cache "$FULL_PATH"
+            return 0
+        fi
+        
+        echo "The following directories will be removed:"
+        for dir in "${dirs_to_remove[@]}"; do
+            echo "  $(basename "$dir")"
+        done
+        
+        read -p "Continue? (y/N): " -n 1 -r
+        echo
+        if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+            echo "Uninstall cancelled."
+            return 0
+        fi
+        
+        # Remove directories
+        for dir in "${dirs_to_remove[@]}"; do
+            echo "Removing: $(basename "$dir")"
+            rm -rf "$dir"
+            ((removed_count++))
+        done
+    fi
+    
+    echo "Successfully removed $removed_count directory/directories from: $FULL_PATH"
+    
+    # Update icon cache after removal
+    update_icon_cache "$FULL_PATH"
+    echo "Icon removal completed."
+}
+
+# Main execution
+if [[ "$INSTALL" == true ]]; then
+    install_icons
+elif [[ "$UNINSTALL" == true ]]; then
+    uninstall_icons
+fi
+
+exit 0

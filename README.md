@@ -20,24 +20,25 @@ Clone the repository to your local machine:
 
 ```sh
 git clone https://github.com/dpejoh/Adwaita-colors
+cd Adwaita-colors
 ```
 
 To install the icons globally, simply run:
 
 ```sh
-sudo cp -r ./Adwaita-colors/* /usr/share/icons/
+sudo ./setup -i
 ```
 For removing the icon theme run:
 ```sh
-sudo rm -rf /usr/share/icons/Adwaita-*
+sudo ./setup -u
 ```
 For immutable distros like Fedora Silverblue, the global installation is different, use:
 ```sh
-sudo cp -r ./Adwaita-colors/* /.local/share/icons/
+./setup -i
 ```
 For removing the icon theme on immutable distros run:
 ```sh
-sudo rm -rf /.local/share/icons/Adwaita-*
+./setup -u
 ```
 > [!NOTE]
 > You can also install the icon theme in the user directory without any problems, but for best compatibility with apps, it is recommended to install it system-wide.
