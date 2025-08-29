@@ -40,66 +40,22 @@ For removing the icon theme on immutable distros run:
 ```sh
 ./setup -u
 ```
-> [!NOTE]
+> [!NOTES]
+
 > You can also install the icon theme in the user directory without any problems, but for best compatibility with apps, it is recommended to install it system-wide.
 
-### Install with package manager:
-
-From v2.4.1, a .deb and .rpm packages is available on [GitHub latest release](https://github.com/dpejoh/Adwaita-colors/releases/tag/v2.4.1)
-
-### Ubuntu, Debian-based distros:
-
-Download the latest version from GitHub:
-```sh
-wget https://github.com/dpejoh/Adwaita-colors/releases/download/v2.4.1/adwaita-colors-theme-2.4.1.deb
-```
-Install it:
-```sh
-sudo dpkg -i adwaita-colors-theme-2.4.1.deb
-```
-### Fedora, CentOS and RHEL:
-
-Download the latest version from GitHub:
-```sh
-wget https://github.com/dpejoh/Adwaita-colors/releases/download/v2.4.1/adwaita-colors-theme-2.4.1.rpm
-```
-Install it:
-```sh
-sudo dnf install adwaita-colors-theme-2.4.1.rpm
-```
-
-### Arch Linux (AUR):
-
-Release-based [adwaita-colors-icon-theme](https://aur.archlinux.org/packages/adwaita-colors-icon-theme):  
-```sh
-paru adwaita-colors-icon-theme
-```
-<sup>*Replace `paru` with `yay -S` or your favourite AUR helper install command.</sup>
-
-Git-based [adwaita-colors-icon-theme-git](https://aur.archlinux.org/packages/adwaita-colors-icon-theme-git) for keeping up with all git changes between releases:  
-```sh
-paru adwaita-colors-icon-theme-git
-```
-<sup>*Replace `paru` with `yay -S` or your favourite AUR helper install command.</sup>
-
-> [!TIP]
-> Once the icons are installed, apply the theme through GNOME Tweaks.
+> Adwaita-colors no longer requires separate DEB, RPM, or AUR packages. Thanks to **@fastrizwaan**, the project now includes a unified `setup` script that simplifies both installation and uninstallation across all Linux distributions.
 
 ## MoreWaita:
 
 To install MoreWaita with Adwaita-colors:
 
 - Ensure that MoreWaita is installed.
-- Run MoreWaita.sh after cloning the repository, or run command below directly:
-
-#### With sudo:
+- Run `morewaita.sh` after cloning the repository with the following command:
 ```sh
-wget -O MoreWaita.sh https://raw.githubusercontent.com/dpejoh/Adwaita-colors/main/MoreWaita.sh && chmod +x MoreWaita.sh && sudo ./MoreWaita.sh
+chmod +x ./morewaita.sh && ./morewaita.sh
 ```
 
-> [!NOTE]
- 
-> Arch Linux AUR packages integrate with MoreWaita automatically.
 ## Auto Match Adwaita-color with Accent Colors:
 
 To automatically match your color accent with the Adwaita theme, you can install the "Auto Adwaita Colors" extension by [@celiopy](https://github.com/celiopy/auto-adwaita-colors).
