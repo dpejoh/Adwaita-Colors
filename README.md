@@ -14,7 +14,7 @@ In addition, I added MoreWaita icon folders and made them themed to allow for mo
 
 This theme will not work properly without the original Adwaita icon theme.
 
-### Regular installation (Recommended & Updated):
+### Steps:
 
 Clone the repository to your local machine:
 
