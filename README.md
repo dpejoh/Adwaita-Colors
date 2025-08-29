@@ -53,7 +53,7 @@ To install MoreWaita with Adwaita-colors:
 - Ensure that MoreWaita is installed.
 - Run `morewaita.sh` after cloning the repository with the following command:
 ```sh
-chmod +x ./morewaita.sh && ./morewaita.sh
+./morewaita.sh
 ```
 
 ## Auto Match Adwaita-color with Accent Colors:
