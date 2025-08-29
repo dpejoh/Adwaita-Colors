@@ -20,6 +20,7 @@ Clone the repository to your local machine:
 
 ```sh
 git clone https://github.com/dpejoh/Adwaita-colors
+cd Adwaita-colors
 ```
 
 To install the icons globally, simply run:
