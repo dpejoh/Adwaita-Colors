@@ -58,24 +58,22 @@ To install MoreWaita with Adwaita-colors:
 
 ## Auto Match Adwaita-color with Accent Colors:
 
-To automatically match your color accent with the Adwaita theme, you can install the "Auto Adwaita Colors" extension by [@celiopy](https://github.com/celiopy/auto-adwaita-colors).
+To automatically match your accent color with the Adwaita Colors theme, install the official **Adwaita Colors Home** extension.
+
+It watches your GNOME accent color setting and switches the icon theme instantly. It also handles installing and updating Adwaita Colors directly from its preferences UI, so no terminal is needed after the initial setup.
 
 ### Installation:
 
-You can install the extension directly from GNOME Shell Extensions:
-
-[<img src="https://micheleg.github.io/dash-to-dock/media/get-it-on-ego.png" height="100">](https://extensions.gnome.org/extension/7529/auto-adwaita-colors/)
-
-Or download the latest release from GitHub by running the following command:
+Download the latest release and install it with:
 
 ```sh
-wget https://github.com/celiopy/auto-adwaita-colors/releases/download/3.0/auto-adwaita-colors@celiopy.zip
+gnome-extensions install adwaita-colors-home.zip
 ```
 
-Install the extension using GNOME:
+Then log out and back in (Wayland) or press `Alt+F2` and type `r` (X11), then enable it:
 
 ```sh
-gnome-extensions install --force "auto-adwaita-colors@celiopy.zip"
+gnome-extensions enable adwaita-colors-home@dpejoh
 ```
 
-After installation, open the GNOME Extensions Manager and enable the extension from there.
+Requires GNOME 47+.
