@@ -1,14 +1,12 @@
 #!/bin/bash
 
-set -euo pipefail
+set -eo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-
 source "${SCRIPT_DIR}/variants.conf"
 
 declare -A DIR_CONTEXT
 DIR_CONTEXT[apps]="Applications"
-DIR_CONTEXT[devices]="Devices"
 DIR_CONTEXT[mimetypes]="MimeTypes"
 DIR_CONTEXT[places]="Places"
 DIR_CONTEXT[status]="Status"
@@ -18,6 +16,12 @@ DIR_CONTEXT[emblems]="Emblems"
 DIR_CONTEXT[emotes]="Emotes"
 DIR_CONTEXT[legacy]="Legacy"
 DIR_CONTEXT[ui]="UI"
+
+# Build a lookup for valid variants (used for validation)
+declare -A IS_VALID_VARIANT
+for v in "${ALL_VARIANTS[@]}"; do
+    IS_VALID_VARIANT[$v]=1
+done
 
 # --- Help ---
 show_help() {
@@ -47,12 +51,27 @@ Examples:
 EOF
 }
 
-# --- Locate system Adwaita ---
+# --- Helpers ---
+
+# Run a command with sudo if the target path requires it
+_run_as() {
+    local path="$1"; shift
+    # Walk up to find an existing directory for writability check
+    local check="$path"
+    while [[ ! -d "$check" && "$check" != "/" ]]; do
+        check="$(dirname "$check")"
+    done
+    if [[ -w "$check" ]]; then
+        "$@"
+    else
+        sudo "$@"
+    fi
+}
+
 find_adwaita() {
     for p in "${ADWAITA_PATHS[@]}"; do
-        expanded=$(eval echo "$p")
-        if [ -d "$expanded/scalable" ]; then
-            echo "$expanded"
+        if [ -d "$p/scalable" ]; then
+            echo "$p"
             return 0
         fi
     done
@@ -60,23 +79,41 @@ find_adwaita() {
     return 1
 }
 
+get_install_path() {
+    local prefix="$1" mode="$2"
+    if [[ -z "$prefix" ]]; then
+        if [[ "$mode" == "install" ]]; then
+            if [[ $EUID -eq 0 ]] || [[ -w "/usr/share" ]]; then
+                echo "/usr/share/icons"
+            else
+                echo "$HOME/.local/share/icons"
+            fi
+        else
+            for p in "${ADWAITA_PATHS[@]}"; do
+                local base="${p%/Adwaita}"
+                if [[ -d "$base" ]] && [[ -n "$(find "$base" -maxdepth 1 -type d -name 'Adwaita-*' -print -quit 2>/dev/null)" ]]; then
+                    echo "$base"
+                    return
+                fi
+            done
+            echo "/usr/share/icons"
+        fi
+        return
+    fi
+    prefix="${prefix/#\~/$HOME}"
+    [[ "$prefix" == "/" ]] && echo "/usr/share/icons" || echo "${prefix}/share/icons"
+}
+
 # --- Generate index.theme ---
 generate_index() {
-    local variant="$1"
-    local theme_dir="$2"
-
+    local variant="$1" theme_dir="$2"
     local inherits="Adwaita,AdwaitaLegacy,hicolor"
-    if [ "$variant" != "blue" ]; then
-        inherits="Adwaita,Adwaita-blue,AdwaitaLegacy,hicolor"
-    fi
+    [[ "$variant" != "blue" ]] && inherits="Adwaita,Adwaita-blue,AdwaitaLegacy,hicolor"
 
-    local dirs=""
-    if [ -d "$theme_dir/scalable" ]; then
-        for d in "$theme_dir/scalable"/*/; do
-            dname=$(basename "$d")
-            [ -z "$dirs" ] && dirs="scalable/${dname}" || dirs="${dirs},scalable/${dname}"
-        done
-    fi
+    local dirs=()
+    for d in "$theme_dir/scalable"/*/; do
+        dirs+=("scalable/$(basename "$d")")
+    done
 
     cat > "${theme_dir}/index.theme" << THEMEOF
 [Icon Theme]
@@ -100,16 +137,15 @@ PanelDefault=32
 PanelSizes=16,22,32,48,64,72,96,128
 
 # Directory list
-Directories=${dirs},
+Directories=$(IFS=,; echo "${dirs[*]}"),
 THEMEOF
 
     for d in "$theme_dir/scalable"/*/; do
-        dname=$(basename "$d")
-        context="${DIR_CONTEXT[$dname]:-Applications}"
+        local dname=$(basename "$d")
         cat >> "${theme_dir}/index.theme" << DIRSEC
 
 [scalable/${dname}]
-Context=${context}
+Context=${DIR_CONTEXT[$dname]:-Applications}
 Size=128
 MinSize=8
 MaxSize=512
@@ -120,46 +156,38 @@ DIRSEC
 
 # --- Color replacement ---
 recolor_svgs() {
-    local variant="$1"
-    local theme_dir="$2"
+    local variant="$1" theme_dir="$2"
     local mapping="${COLOR_MAP[$variant]:-}"
-    [ -z "$mapping" ] && return 0
+    [[ -z "$mapping" ]] && return 0
 
-    local sed_expr=""
+    local sed_args=()
     for pair in $mapping; do
-        src="${pair%%:*}"
-        dst="${pair##*:}"
-        [ -n "$sed_expr" ] && sed_expr+="; "
-        sed_expr+="s/#${src}/#${dst}/Ig"
+        sed_args+=(-e "s/#${pair%%:*}/#${pair##*:}/Ig")
     done
 
-    find "$theme_dir" -name '*.svg' -exec sed -i "$sed_expr" {} +
+    find "$theme_dir" -name '*.svg' -exec sed -i "${sed_args[@]}" {} +
 }
 
 # --- Remove SVGs unchanged from system Adwaita (they inherit) ---
 dedup_svgs() {
-    local theme_dir="$1"
-    local adwaita_src="$2"
+    local theme_dir="$1" adwaita_src="$2"
 
     for svg in "$theme_dir/scalable"/*/*.svg; do
-        [ -f "$svg" ] || continue
+        [[ -f "$svg" ]] || continue
         local rel="${svg#$theme_dir/scalable/}"
         local sys_svg="${adwaita_src}/scalable/${rel}"
+
+        # Skip if unchanged from system (inherits) or in skip list
         if [ -f "$sys_svg" ] && cmp -s "$svg" "$sys_svg"; then
             rm "$svg"
-            continue
+        else
+            for skip in "${SKIP_FILES[@]}"; do
+                [ "$rel" = "$skip" ] && { rm "$svg"; break; }
+            done
         fi
-        # Remove files in the skip list (accent blues in non-accent contexts)
-        for skip in "${SKIP_FILES[@]}"; do
-            if [ "$rel" = "$skip" ]; then
-                rm "$svg"
-                break
-            fi
-        done
     done
-    # Remove empty directories left behind
     for d in "$theme_dir/scalable"/*/; do
-        [ -d "$d" ] && rmdir "$d" 2>/dev/null || true
+        rmdir "$d" 2>/dev/null || true
     done
 }
 
@@ -167,27 +195,20 @@ dedup_svgs() {
 create_mimetype_symlinks() {
     local mimetype_dir="$1"
     for entry in "${MIMETYPE_SYMLINKS[@]}"; do
-        local link="${entry%%:*}"
-        local target="${entry##*:}"
-        if [ ! -e "$mimetype_dir/$link" ]; then
-            ln -s "$target" "$mimetype_dir/$link" 2>/dev/null || true
-        fi
+        local link="${entry%%:*}" target="${entry##*:}"
+        [[ ! -e "$mimetype_dir/$link" ]] && ln -s "$target" "$mimetype_dir/$link" 2>/dev/null || true
     done
 }
 
 # --- Generate one variant ---
 generate_variant() {
-    local variant="$1"
-    local output_dir="$2"
-    local adwaita_src="$3"
-    local with_folders="${4:-false}"
+    local variant="$1" output_dir="$2" adwaita_src="$3" with_folders="${4:-false}"
     local theme_dir="${output_dir}/Adwaita-${variant}"
 
     echo "  Generating Adwaita-${variant}..."
     rm -rf "$theme_dir"
     mkdir -p "$theme_dir/scalable"
 
-    # 1. Copy accent-colored SVGs from system Adwaita (places, status)
     for dir in $ADWAITA_DIRS; do
         local src_dir="${adwaita_src}/scalable/${dir}"
         if [ -d "$src_dir" ]; then
@@ -197,122 +218,52 @@ generate_variant() {
         fi
     done
 
-    # 2. Copy apps/ (per-variant pre-colored, no recolor)
+    # Apps (per-variant pre-colored)
     local apps_src="${SCRIPT_DIR}/apps/${variant}"
     if [ -d "$apps_src" ]; then
         mkdir -p "${theme_dir}/scalable/apps"
         cp -a "$apps_src"/*.svg "${theme_dir}/scalable/apps/" 2>/dev/null || true
     fi
 
-    # 3. Recolor everything so far
+    # Recolor + dedup
     recolor_svgs "$variant" "$theme_dir"
     dedup_svgs "$theme_dir" "$adwaita_src"
 
-    # 4. Custom folder SVGs (if requested, from single blue source)
+    # Custom folders
     if [ "$with_folders" = true ]; then
         mkdir -p "${theme_dir}/scalable/places"
-        for f in "${SCRIPT_DIR}/folders/"*.svg; do
-            [ -f "$f" ] && cp -a "$f" "${theme_dir}/scalable/places/"
-        done
-        for l in "${SCRIPT_DIR}/folders/"*; do
-            [ -L "$l" ] && cp -a "$l" "${theme_dir}/scalable/places/"
-        done
+        cp -a "${SCRIPT_DIR}/folders/"* "${theme_dir}/scalable/places/"
         recolor_svgs "$variant" "$theme_dir"
     fi
 
-    # 5. Fixed per-variant mimetypes (pre-colored, recolor fixes any leftover blues)
+    # Fixed per-variant mimetypes
     local mime_src="${SCRIPT_DIR}/mimetypes/${variant}"
     if [ -d "$mime_src" ]; then
         mkdir -p "${theme_dir}/scalable/mimetypes"
-        for f in "$mime_src"/*.svg; do
-            [ -f "$f" ] && cp "$f" "${theme_dir}/scalable/mimetypes/"
-        done
+        cp -a "$mime_src"/*.svg "${theme_dir}/scalable/mimetypes/" 2>/dev/null || true
         recolor_svgs "$variant" "$theme_dir"
         create_mimetype_symlinks "${theme_dir}/scalable/mimetypes"
     fi
 
     generate_index "$variant" "$theme_dir"
-
-    if command -v gtk-update-icon-cache &> /dev/null; then
-        gtk-update-icon-cache -f "$theme_dir" &> /dev/null || true
-    fi
-}
-
-# --- Install helpers ---
-need_sudo() {
-    local path="$1"
-    # Walk up until we find an existing directory
-    while [[ ! -d "$path" && "$path" != "/" ]]; do
-        path="$(dirname "$path")"
-    done
-    if [[ -w "$path" ]]; then
-        return 1
-    else
-        return 0
-    fi
-}
-
-get_install_path() {
-    local prefix="$1"
-    local mode="$2"
-
-    if [[ -z "$prefix" ]]; then
-        if [[ "$mode" == "install" ]]; then
-            if [[ $EUID -eq 0 ]] || [[ -w "/usr/share" ]]; then
-                echo "/usr/share/icons"
-            else
-                echo "$HOME/.local/share/icons"
-            fi
-        else
-            for p in "/usr/share/icons" "/usr/local/share/icons" "/var/usr/local/share/icons" "$HOME/.local/share/icons" "$HOME/.icons"; do
-                if [[ -d "$p" ]] && [[ -n "$(find "$p" -maxdepth 1 -type d -name 'Adwaita-*' -print -quit 2>/dev/null)" ]]; then
-                    echo "$p"
-                    return
-                fi
-            done
-            echo "/usr/share/icons"
-        fi
-        return
-    fi
-
-    prefix="${prefix/#\~/$HOME}"
-    if [[ "$prefix" == "/" ]]; then
-        echo "/usr/share/icons"
-    else
-        echo "${prefix}/share/icons"
-    fi
 }
 
 update_icon_cache() {
-    local path="$1"
     echo "  Updating icon cache..."
-
-    if need_sudo "$path"; then
-        if command -v gtk-update-icon-cache &> /dev/null; then
-            sudo gtk-update-icon-cache -f "$path" 2>/dev/null || true
-        elif command -v xdg-icon-resource &> /dev/null; then
-            sudo xdg-icon-resource forceupdate 2>/dev/null || true
-        fi
-    else
-        if command -v gtk-update-icon-cache &> /dev/null; then
-            gtk-update-icon-cache -f "$path" 2>/dev/null || true
-        elif command -v xdg-icon-resource &> /dev/null; then
-            xdg-icon-resource forceupdate 2>/dev/null || true
-        fi
+    if command -v gtk-update-icon-cache &> /dev/null; then
+        _run_as "$1" gtk-update-icon-cache -f "$1" 2>/dev/null || true
     fi
 }
 
 # --- Install ---
 do_install() {
-    local with_folders="$1"
-    local prefix="$2"
+    local with_folders="$1" prefix="$2"
     shift 2
     local variants=("$@")
 
     local install_path
     install_path=$(get_install_path "$prefix" "install")
 
-    # Find system Adwaita
     local adwaita_src
     adwaita_src=$(find_adwaita) || true
     if [ -z "$adwaita_src" ]; then
@@ -322,60 +273,36 @@ do_install() {
     fi
 
     echo "Generating ${#variants[@]} variant(s) from ${adwaita_src}..."
-    mkdir -p "$SCRIPT_DIR"
     for variant in "${variants[@]}"; do
         generate_variant "$variant" "$SCRIPT_DIR" "$adwaita_src" "$with_folders"
     done
 
     echo ""
     echo "Installing to ${install_path}..."
+    _run_as "$install_path" mkdir -p "$install_path"
+    for variant in "${variants[@]}"; do
+        local src="${SCRIPT_DIR}/Adwaita-${variant}"
+        echo "  Installing Adwaita-${variant}..."
+        _run_as "$install_path" cp -r "$src" "$install_path/"
+    done
 
-    if need_sudo "$install_path"; then
-        sudo mkdir -p "$install_path"
-        for variant in "${variants[@]}"; do
-            local src="${SCRIPT_DIR}/Adwaita-${variant}"
-            echo "  Installing Adwaita-${variant}..."
-            sudo cp -r "$src" "$install_path/"
-        done
-    else
-        mkdir -p "$install_path"
-        for variant in "${variants[@]}"; do
-            local src="${SCRIPT_DIR}/Adwaita-${variant}"
-            echo "  Installing Adwaita-${variant}..."
-            cp -r "$src" "$install_path/"
-        done
-    fi
-
-    # Clean up local generated copies
     rm -rf "${SCRIPT_DIR}"/Adwaita-*
-
     update_icon_cache "$install_path"
     echo "Installation complete."
 }
 
 # --- Uninstall ---
 do_uninstall() {
-    local prefix="$1"
     local install_path
-    install_path=$(get_install_path "$prefix" "uninstall")
+    install_path=$(get_install_path "$1" "uninstall")
 
     echo "Removing from ${install_path}..."
-
-    if [[ ! -d "$install_path" ]]; then
-        echo "Warning: Directory does not exist: $install_path"
-        return 0
-    fi
+    [[ ! -d "$install_path" ]] && { echo "Warning: Directory does not exist: $install_path"; return 0; }
 
     local dirs=()
-    if need_sudo "$install_path"; then
-        while IFS= read -r -d '' dir; do
-            dirs+=("$dir")
-        done < <(sudo find "$install_path" -maxdepth 1 -type d -name "Adwaita-*" -print0 2>/dev/null)
-    else
-        while IFS= read -r -d '' dir; do
-            dirs+=("$dir")
-        done < <(find "$install_path" -maxdepth 1 -type d -name "Adwaita-*" -print0 2>/dev/null)
-    fi
+    while IFS= read -r -d '' dir; do
+        dirs+=("$dir")
+    done < <(_run_as "$install_path" find "$install_path" -maxdepth 1 -type d -name "Adwaita-*" -print0 2>/dev/null)
 
     if [[ ${#dirs[@]} -eq 0 ]]; then
         echo "  No Adwaita-* directories found."
@@ -388,25 +315,14 @@ do_uninstall() {
         echo "    $(basename "$dir")"
     done
 
-    if [[ ! -t 0 ]]; then
-        # Non-interactive: skip confirmation (used by -u flag)
-        local confirm="y"
-    else
-        read -p "  Remove these? (y/N): " -n 1 -r confirm
-        echo
-        _flush_stdin
-    fi
-    if [[ ! "$confirm" =~ ^[Yy]$ ]]; then
-        echo "  Cancelled."
-        return 0
+    if [[ -t 0 ]]; then
+        local confirm
+        read -p "  Remove these? (y/N): " confirm
+        [[ ! "$confirm" =~ ^[Yy]$ ]] && { echo "  Cancelled."; return 0; }
     fi
 
     for dir in "${dirs[@]}"; do
-        if need_sudo "$install_path"; then
-            sudo rm -rf "$dir"
-        else
-            rm -rf "$dir"
-        fi
+        _run_as "$install_path" rm -rf "$dir"
     done
 
     update_icon_cache "$install_path"
@@ -414,30 +330,8 @@ do_uninstall() {
 }
 
 # --- Interactive questionnaire ---
-_flush_stdin() {
-    # Drain any leftover input after a single-character read
-    # Use a named variable to avoid overwriting REPLY
-    local _ignore
-    read -r -t 0.1 -d '' -n 10000 _ignore 2>/dev/null || true
-}
-
-_prompt_choice() {
-    local prompt="$1" default="$2"
-    local reply
-    read -p "$prompt" reply
-    echo "${reply:-$default}"
-}
-
-_prompt_confirm() {
-    local reply
-    read -p "  Proceed? (Y/n): " -n 1 reply
-    echo ""
-    _flush_stdin
-    [[ -z "$reply" || "$reply" =~ ^[Yy]$ ]]
-}
-
 run_interactive() {
-    local mode="" variants=() prefix=""
+    local mode="" variants=()
 
     echo ""
     echo "  Adwaita Colors — Setup"
@@ -449,7 +343,7 @@ run_interactive() {
     echo "    1) Install icon themes"
     echo "    2) Remove icon themes"
     local action_choice
-    action_choice=$(_prompt_choice "  (1/2): " "1")
+    read -p "  (1/2): " action_choice
     case "$action_choice" in
         1) mode="install" ;;
         2) mode="uninstall" ;;
@@ -462,7 +356,7 @@ run_interactive() {
     echo "    1) All 10 variants"
     echo "    2) Choose specific variants"
     local var_choice
-    var_choice=$(_prompt_choice "  (1/2): " "1")
+    read -p "  (1/2): " var_choice
 
     if [[ "$var_choice" == "2" ]]; then
         echo ""
@@ -470,30 +364,21 @@ run_interactive() {
         for i in "${!ALL_VARIANTS[@]}"; do
             printf "    %2d) %s\n" $((i + 1)) "${ALL_VARIANTS[$i]}"
         done
-        local selection raw_tokens
+        local selection
         read -p "  Selection: " selection
-        # Split on both commas and spaces
-        IFS=',' read -ra raw_tokens <<< "$selection"
-        for part in "${raw_tokens[@]}"; do
-            for token in $part; do
-                if [[ "$token" =~ ^[0-9]+$ ]]; then
-                    local idx=$((token - 1))
-                    if [[ $idx -ge 0 && $idx -lt ${#ALL_VARIANTS[@]} ]]; then
-                        variants+=("${ALL_VARIANTS[$idx]}")
-                    fi
-                fi
-            done
+        for token in $(echo "$selection" | tr ',' ' '); do
+            [[ "$token" =~ ^[0-9]+$ ]] || continue
+            local idx=$((token - 1))
+            [[ $idx -ge 0 && $idx -lt ${#ALL_VARIANTS[@]} ]] && variants+=("${ALL_VARIANTS[$idx]}")
         done
-        if [[ ${#variants[@]} -eq 0 ]]; then
-            echo "  No valid variants selected, using all."
-            variants=("${ALL_VARIANTS[@]}")
-        fi
+        [[ ${#variants[@]} -eq 0 ]] && variants=("${ALL_VARIANTS[@]}")
     else
         variants=("${ALL_VARIANTS[@]}")
     fi
 
-    # Step 3: location (install only)
+    # Step 3-4: location + folders (install only)
     local with_folders=false
+    local PREFIX=""
     if [[ "$mode" == "install" ]]; then
         echo ""
         echo "  Install location?"
@@ -501,23 +386,19 @@ run_interactive() {
         echo "    2) Just for my user (~/.local/share/icons)"
         echo "    3) Custom path"
         local loc_choice
-        loc_choice=$(_prompt_choice "  (1/2/3): " "2")
-
+        read -p "  (1/2/3): " loc_choice
         case "$loc_choice" in
-            1) PREFIX="" ;;  # auto-detect system
+            1) PREFIX="" ;;
             2) PREFIX="$HOME/.local" ;;
             3) read -p "  Enter path (e.g. /usr, /app, ~/.local): " PREFIX ;;
             *) echo "  Invalid choice."; exit 1 ;;
         esac
 
-        # Step 4: custom folders
         echo ""
         echo "  Include additional custom folder icons? (y/N)"
         echo "    These add branded folder icons (GitHub, GitLab, etc.)"
         local folder_choice
-        read -p "  (y/N): " -n 1 folder_choice
-        echo ""
-        _flush_stdin
+        read -p "  (y/N): " folder_choice
         [[ "$folder_choice" =~ ^[Yy]$ ]] && with_folders=true
     fi
 
@@ -531,14 +412,12 @@ run_interactive() {
         local path
         path=$(get_install_path "$PREFIX" "install")
         echo "  Location: ${path}"
-        if need_sudo "$path"; then
-            echo "  (sudo will be used)"
-        fi
-        echo "  Custom folders: $([ "$with_folders" = true ] && echo yes || echo no)"
+        [[ "$with_folders" == true ]] && echo "  Custom folders: yes" || echo "  Custom folders: no"
     fi
-    _prompt_confirm || { echo "  Cancelled."; exit 0; }
+    local confirm
+    read -p "  Proceed? (Y/n): " confirm
+    [[ ! "$confirm" =~ ^[Yy]$ ]] && { echo "  Cancelled."; exit 0; }
 
-    # Execute
     case "$mode" in
         install)   do_install "$with_folders" "$PREFIX" "${variants[@]}" ;;
         uninstall) do_uninstall "$PREFIX" ;;
@@ -547,16 +426,16 @@ run_interactive() {
 
 # --- Main ---
 
-PREFIX=""
-MODE=""
-WITH_FOLDERS=false
-VARIANTS=()
-
-# No args at all → interactive mode
+# No args → interactive
 if [[ $# -eq 0 ]]; then
     run_interactive
     exit 0
 fi
+
+PREFIX=""
+MODE=""
+WITH_FOLDERS=false
+VARIANTS=()
 
 while [[ $# -gt 0 ]]; do
     case $1 in
@@ -570,35 +449,17 @@ while [[ $# -gt 0 ]]; do
         -*)
             echo "Unknown option: $1"
             echo "Use -h or --help for usage information."
-            exit 1
-            ;;
+            exit 1 ;;
         *)
-            VARIANTS+=("$1")
-            shift
-            ;;
+            VARIANTS+=("$1"); shift ;;
     esac
 done
 
-if [ -z "$MODE" ]; then
-    echo "Error: Specify -i (install) or -u (uninstall)."
-    echo "Use -h or --help for usage information."
-    exit 1
-fi
-
-if [ ${#VARIANTS[@]} -eq 0 ]; then
-    VARIANTS=("${ALL_VARIANTS[@]}")
-fi
+[ -z "$MODE" ] && { echo "Error: Specify -i (install) or -u (uninstall)."; echo "Use -h or --help for usage information."; exit 1; }
+[ ${#VARIANTS[@]} -eq 0 ] && VARIANTS=("${ALL_VARIANTS[@]}")
 
 for v in "${VARIANTS[@]}"; do
-    valid=false
-    for av in "${ALL_VARIANTS[@]}"; do
-        [ "$v" = "$av" ] && { valid=true; break; }
-    done
-    if [ "$valid" = false ]; then
-        echo "Error: Unknown variant '$v'"
-        echo "Available variants: ${ALL_VARIANTS[*]}"
-        exit 1
-    fi
+    [ "${IS_VALID_VARIANT[$v]}" ] || { echo "Error: Unknown variant '$v'"; echo "Available variants: ${ALL_VARIANTS[*]}"; exit 1; }
 done
 
 case "$MODE" in

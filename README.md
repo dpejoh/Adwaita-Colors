@@ -4,50 +4,58 @@
 
 Adwaita Colors enhances the Adwaita icon theme by integrating GNOME's accent color feature, introduced in GNOME 47. This project ensures that your Adwaita icons reflect the same accent color as your GNOME theme, instead of the default blue, for a more cohesive and customized look.
 
-GNOME 47 introduced a "color accent" feature to allow users to select a system-wide accent color. However, the default Adwaita icon theme does not automatically adapt to this accent color, leaving the icons in the default blue. Adwaita Colors fixes this by applying your chosen accent color to the icons.
-
 ## How It Works
 
-The Adwaita Colors icon variants (`Adwaita-blue`, `Adwaita-teal`, `Adwaita-brown`, etc.) are **generated on demand** from your system's installed Adwaita icon theme. The script copies accent-colored SVG files from `/usr/share/icons/Adwaita`, applies a hex color replacement, then removes any SVGs identical to the originals (they inherit through the theme chain instead).
+The `setup` script generates icon theme variants (`Adwaita-blue`, `Adwaita-teal`, `Adwaita-brown`, etc.) from your system's installed Adwaita theme. It copies accent-colored SVGs from `/usr/share/icons/Adwaita/scalable/{places,status}`, applies a hex color replacement per variant, then removes any SVGs identical to the originals (they inherit through the chain instead).
 
-- Each variant only ships the SVGs that actually change — everything else inherits
-- When GNOME updates upstream icons, you pick up changes automatically
-- The inherited SVG files aren't duplicated across 10 variants
+**Places and status** — auto-recolored from system Adwaita. Only SVGs that actually change are kept; everything else inherits.
 
-App badge icons in `apps/` and custom folder icons in `folders/` are single blue-colored source sets that get recolored per variant. Per-variant mimetype icons in `mimetypes/{variant}/` are pre-colored and used as-is, with symlinks created for broader file format coverage.
+**Apps, folders, mimetypes** — per-variant pre-colored, copied as-is without recolor. Apps and folders are stored in `apps/{variant}/` and `mimetypes/{variant}/`. Custom folder SVGs (`-f` flag) use a single blue source in `folders/` that gets recolored.
+
+Mimetype symlinks for Google Docs, LibreOffice, STL models, and other formats are created automatically in each variant.
 
 ## Requirements
 
 - The original Adwaita icon theme installed (ships with GNOME)
-- `gtk-update-icon-cache` (usually part of `gtk-engines` or `gtk-icon-cache`)
+- `gtk-update-icon-cache`
 
-## Installation
-
-Clone the repository:
+## Usage
 
 ```sh
 git clone https://github.com/dpejoh/Adwaita-colors
 cd Adwaita-colors
 ```
 
-To install the icons globally:
+Just run `./setup` with no arguments for an interactive questionnaire:
 
-```sh
-sudo ./setup -i
+```
+  Adwaita Colors — Setup
+  ======================
+
+  What would you like to do?
+    1) Install icon themes
+    2) Remove icon themes
+  (1/2):
+
+  Which color variants?
+    1) All 10 variants
+    2) Choose specific variants
+  (1/2):
+
+  Install location?
+    1) System-wide (/usr/share/icons) — may need sudo
+    2) Just for my user (~/.local/share/icons)
+    3) Custom path
+
+  Include additional custom folder icons? (y/N)
+
+  Summary
+  -------
+  ...
+  Proceed? (Y/n):
 ```
 
-For removing:
-
-```sh
-sudo ./setup -u
-```
-
-For immutable distros like Fedora Silverblue:
-
-```sh
-./setup -i
-./setup -u
-```
+Or use flags directly:
 
 ```sh
 sudo ./setup -i                    # Install all variants
@@ -55,51 +63,41 @@ sudo ./setup -i teal               # Install just Adwaita-teal
 sudo ./setup -i teal brown         # Install specific variants
 sudo ./setup -i -P /app            # Install to /app/share/icons
 ./setup -i                         # Install to user dir (no sudo)
+sudo ./setup -i -f                 # Include custom folder icons
+sudo ./setup -i -f teal            # Teal with custom folders
+sudo ./setup -u                    # Uninstall
 ```
 
-To include additional custom folder icons (GitHub, GitLab, Bitwig, etc.), use `-f`:
-
-```sh
-sudo ./setup -i -f               # Install all variants with custom folders
-sudo ./setup -i -f teal          # Just teal with custom folders
-```
+The script generates variants from system Adwaita, installs them, then cleans up temporary local copies.
 
 > [!NOTE]
-> You can also install the icon theme in the user directory without any problems, but for best compatibility with apps, it is recommended to install it system-wide.
+> You can install to the user directory (`~/.local/share/icons`) without sudo. System-wide installation is recommended for best app compatibility.
 
-## Per-variant Mime Types
+## Custom Folder Icons
 
-Each variant has its own pre-colored mimetype SVGs in `mimetypes/{variant}/`. Place your fixed SVGs there (inode-directory.svg, application-x-addon.svg, oasis-presentation.svg, oasis-web.svg, application-x-model.svg, text-html.svg). The script copies them and creates symlinks for Google Docs, LibreOffice, STL models, and other formats that Adwaita doesn't have icons for.
+Use `-f` or `--folders` to include branded folder icons (GitHub, GitLab, Bitwig, etc.):
+
+```sh
+sudo ./setup -i -f
+```
+
+These live as a single blue-colored source in `folders/` and get recolored per variant.
 
 ## MoreWaita
 
-To install MoreWaita with Adwaita-colors:
-
-- Ensure that [MoreWaita](https://github.com/somepaulo/MoreWaita) is installed.
-- Run `morewaita.sh` after installing:
+Ensure [MoreWaita](https://github.com/somepaulo/MoreWaita) is installed, then run:
 
 ```sh
 sudo ./setup -i -f
 ./morewaita.sh
 ```
 
-## Auto Match Adwaita-color with Accent Colors
+## Auto Match with Accent Color
 
-To automatically match your accent color with the Adwaita Colors theme, install the official **Adwaita Colors Home** extension.
-
-It watches your GNOME accent color setting and switches the icon theme instantly. It also handles installing and updating Adwaita Colors directly from its preferences UI, so no terminal is needed after the initial setup.
-
-### Installation
-
-Download the latest release and install it with:
+Install the official **Adwaita Colors Home** GNOME Shell extension. It watches your accent color and switches the icon theme instantly.
 
 ```sh
 gnome-extensions install adwaita-colors-home.zip
-```
-
-Then log out and back in (Wayland) or press `Alt+F2` and type `r` (X11), then enable it:
-
-```sh
 gnome-extensions enable adwaita-colors-home@dpejoh
 ```
 
@@ -110,11 +108,14 @@ Requires GNOME 47+.
 ```
 Adwaita-colors/
 ├── setup                 ← Install / uninstall (does everything)
-├── variants.conf         ← Color mappings + mimetype symlinks
+├── variants.conf         ← Color mappings, mimetype symlinks, skip list
 ├── morewaita.sh          ← MoreWaita integration
-├── apps/                 ← Single blue source for app badge SVGs
 ├── folders/              ← Single blue source for custom folder SVGs
-├── mimetypes/            ← Per-variant pre-colored mimetype SVGs
+├── apps/                 ← Per-variant pre-colored app badge SVGs
+│   ├── blue/
+│   ├── teal/
+│   └── ...
+├── mimetypes/            ← Per-variant pre-colored mimetype SVGs + symlinks
 │   ├── blue/
 │   ├── teal/
 │   └── ...
@@ -123,7 +124,7 @@ Adwaita-colors/
 └── README.md
 ```
 
-No variant directories are shipped — all are generated from system Adwaita during install and cleaned up afterwards.
+No variant directories (`Adwaita-*/`) are shipped — all are generated from system Adwaita during install and cleaned up afterwards.
 
 ## License
 
