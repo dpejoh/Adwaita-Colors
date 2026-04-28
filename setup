@@ -275,6 +275,11 @@ do_install() {
         for variant in "${variants[@]}"; do
             local variant_dir="$install_path/Adwaita-${variant}"
             local folder_svg="$variant_dir/scalable/places/folder.svg"
+            if [ ! -f "$folder_svg" ]; then
+                # Blue variant's folder.svg was deduped (identical to system)
+                # Use system Adwaita's folder.svg as fallback
+                folder_svg="${adwaita_src}/scalable/places/folder.svg"
+            fi
             if [ -f "$folder_svg" ]; then
                 _run_as "$variant_dir" gio set -t string "$variant_dir" \
                     metadata::custom-icon "file://${folder_svg}" 2>/dev/null || true
