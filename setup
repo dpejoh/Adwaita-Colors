@@ -2,6 +2,10 @@
 
 set -eo pipefail
 
+# Print failing line on errors for easier debugging
+error_trap() { echo "Error on line $1" >&2; }
+trap 'error_trap $LINENO' ERR
+
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "${SCRIPT_DIR}/variants.conf"
 
@@ -17,24 +21,28 @@ DIR_CONTEXT[emotes]="Emotes"
 DIR_CONTEXT[legacy]="Legacy"
 DIR_CONTEXT[ui]="UI"
 
-# Build a lookup for valid variants (used for validation)
 declare -A IS_VALID_VARIANT
 for v in "${ALL_VARIANTS[@]}"; do
     IS_VALID_VARIANT[$v]=1
 done
 
-# --- Help ---
 show_help() {
     cat << EOF
 Usage: $(basename "$0") [OPTIONS] [variant1 variant2 ...]
 
 Install or remove Adwaita Colors icon theme variants.
 
-Options:
-    -i, --install           Generate and install icon themes
+Modes:
+    -i, --install           Install icon themes (default scope: user)
     -u, --uninstall         Remove icon themes from system
+
+Scope (with -i):
+    -u, --user              Install to ~/.local/share/icons (default)
+    -g, --global            Install to /usr/share/icons
+    -p, --path=PATH         Install to custom directory (e.g. /app/share/icons)
+
+Options:
     -f, --folders           Include custom folder icons (GitHub, GitLab, etc.)
-    -P, --prefix=PATH       Install prefix (e.g. /usr, ~/.local)
     -l, --list              List available variants
     -h, --help              Show this help message
 
@@ -42,30 +50,14 @@ Variants:
     If no variants are specified, all variants are processed.
 
 Examples:
-    $(basename "$0") -i                  Generate and install all
-    $(basename "$0") -if                 Generate and install with custom folders
-    $(basename "$0") -i -f teal          Just teal with custom folders
-    $(basename "$0") -u                  Uninstall all from system
-    $(basename "$0") -u -P /usr          Uninstall from /usr/share/icons
-    $(basename "$0") -i -P /app          Install to /app/share/icons
+    $(basename "$0") -i                  Install locally (default)
+    $(basename "$0") -i -u               Install locally (explicit)
+    $(basename "$0") -i -g               Install globally (needs sudo)
+    $(basename "$0") -i -g -f            Install globally with folders
+    $(basename "$0") -i -p /app/share/icons  Install to custom path
+    $(basename "$0") -i teal                 Install just Adwaita-teal
+    $(basename "$0") -u                      Uninstall
 EOF
-}
-
-# --- Helpers ---
-
-# Run a command with sudo if the target path requires it
-_run_as() {
-    local path="$1"; shift
-    # Walk up to find an existing directory for writability check
-    local check="$path"
-    while [[ ! -d "$check" && "$check" != "/" ]]; do
-        check="$(dirname "$check")"
-    done
-    if [[ -w "$check" ]]; then
-        "$@"
-    else
-        sudo "$@"
-    fi
 }
 
 find_adwaita() {
@@ -80,28 +72,30 @@ find_adwaita() {
 }
 
 get_install_path() {
-    local prefix="$1" mode="$2"
-    if [[ -z "$prefix" ]]; then
-        if [[ "$mode" == "install" ]]; then
-            if [[ $EUID -eq 0 ]] || [[ -w "/usr/share" ]]; then
-                echo "/usr/share/icons"
-            else
-                echo "$HOME/.local/share/icons"
-            fi
-        else
-            for p in "${ADWAITA_PATHS[@]}"; do
-                local base="${p%/Adwaita}"
-                if [[ -d "$base" ]] && [[ -n "$(find "$base" -maxdepth 1 -type d -name 'Adwaita-*' -print -quit 2>/dev/null)" ]]; then
-                    echo "$base"
-                    return
-                fi
-            done
-            echo "/usr/share/icons"
-        fi
-        return
+    local scope="$1"
+    case "$scope" in
+        user)    echo "$HOME/.local/share/icons" ;;
+        global)  echo "/usr/share/icons" ;;
+        *)       echo "$scope" ;;
+    esac
+}
+
+need_root() {
+    local path="$1"
+    local check="$path"
+    while [[ ! -d "$check" && "$check" != "/" ]]; do
+        check="$(dirname "$check")"
+    done
+    [[ ! -w "$check" ]]
+}
+
+_run_as() {
+    local path="$1"; shift
+    if need_root "$path"; then
+        sudo "$@"
+    else
+        "$@"
     fi
-    prefix="${prefix/#\~/$HOME}"
-    [[ "$prefix" == "/" ]] && echo "/usr/share/icons" || echo "${prefix}/share/icons"
 }
 
 # --- Generate index.theme ---
@@ -154,7 +148,6 @@ DIRSEC
     done
 }
 
-# --- Color replacement ---
 recolor_svgs() {
     local variant="$1" theme_dir="$2"
     local mapping="${COLOR_MAP[$variant]:-}"
@@ -168,7 +161,6 @@ recolor_svgs() {
     find "$theme_dir" -name '*.svg' -exec sed -i "${sed_args[@]}" {} +
 }
 
-# --- Remove SVGs unchanged from system Adwaita (they inherit) ---
 dedup_svgs() {
     local theme_dir="$1" adwaita_src="$2"
 
@@ -177,7 +169,6 @@ dedup_svgs() {
         local rel="${svg#$theme_dir/scalable/}"
         local sys_svg="${adwaita_src}/scalable/${rel}"
 
-        # Skip if unchanged from system (inherits) or in skip list
         if [ -f "$sys_svg" ] && cmp -s "$svg" "$sys_svg"; then
             rm "$svg"
         else
@@ -191,7 +182,6 @@ dedup_svgs() {
     done
 }
 
-# --- Create mimetype symlinks ---
 create_mimetype_symlinks() {
     local mimetype_dir="$1"
     for entry in "${MIMETYPE_SYMLINKS[@]}"; do
@@ -200,7 +190,6 @@ create_mimetype_symlinks() {
     done
 }
 
-# --- Generate one variant ---
 generate_variant() {
     local variant="$1" output_dir="$2" adwaita_src="$3" with_folders="${4:-false}"
     local theme_dir="${output_dir}/Adwaita-${variant}"
@@ -218,25 +207,21 @@ generate_variant() {
         fi
     done
 
-    # Apps (per-variant pre-colored)
     local apps_src="${SCRIPT_DIR}/apps/${variant}"
     if [ -d "$apps_src" ]; then
         mkdir -p "${theme_dir}/scalable/apps"
         cp -a "$apps_src"/*.svg "${theme_dir}/scalable/apps/" 2>/dev/null || true
     fi
 
-    # Recolor + dedup
     recolor_svgs "$variant" "$theme_dir"
     dedup_svgs "$theme_dir" "$adwaita_src"
 
-    # Custom folders
     if [ "$with_folders" = true ]; then
         mkdir -p "${theme_dir}/scalable/places"
         cp -a "${SCRIPT_DIR}/folders/"* "${theme_dir}/scalable/places/"
         recolor_svgs "$variant" "$theme_dir"
     fi
 
-    # Fixed per-variant mimetypes
     local mime_src="${SCRIPT_DIR}/mimetypes/${variant}"
     if [ -d "$mime_src" ]; then
         mkdir -p "${theme_dir}/scalable/mimetypes"
@@ -255,14 +240,13 @@ update_icon_cache() {
     fi
 }
 
-# --- Install ---
 do_install() {
-    local with_folders="$1" prefix="$2"
+    local scope="$1" with_folders="$2"
     shift 2
     local variants=("$@")
 
     local install_path
-    install_path=$(get_install_path "$prefix" "install")
+    install_path=$(get_install_path "$scope")
 
     local adwaita_src
     adwaita_src=$(find_adwaita) || true
@@ -291,10 +275,10 @@ do_install() {
     echo "Installation complete."
 }
 
-# --- Uninstall ---
 do_uninstall() {
+    local scope="$1"
     local install_path
-    install_path=$(get_install_path "$1" "uninstall")
+    install_path=$(get_install_path "$scope")
 
     echo "Removing from ${install_path}..."
     [[ ! -d "$install_path" ]] && { echo "Warning: Directory does not exist: $install_path"; return 0; }
@@ -331,14 +315,13 @@ do_uninstall() {
 
 # --- Interactive questionnaire ---
 run_interactive() {
-    local mode="" variants=()
+    local mode="" variants=() scope="user"
 
     echo ""
     echo "  Adwaita Colors — Setup"
     echo "  ======================"
     echo ""
 
-    # Step 1: action
     echo "  What would you like to do?"
     echo "    1) Install icon themes"
     echo "    2) Remove icon themes"
@@ -350,7 +333,6 @@ run_interactive() {
         *) echo "  Invalid choice."; exit 1 ;;
     esac
 
-    # Step 2: variants
     echo ""
     echo "  Which color variants?"
     echo "    1) All 10 variants"
@@ -376,9 +358,7 @@ run_interactive() {
         variants=("${ALL_VARIANTS[@]}")
     fi
 
-    # Step 3-4: location + folders (install only)
     local with_folders=false
-    local PREFIX=""
     if [[ "$mode" == "install" ]]; then
         echo ""
         echo "  Install location?"
@@ -388,21 +368,19 @@ run_interactive() {
         local loc_choice
         read -p "  (1/2/3): " loc_choice
         case "$loc_choice" in
-            1) PREFIX="" ;;
-            2) PREFIX="$HOME/.local" ;;
-            3) read -p "  Enter path (e.g. /usr, /app, ~/.local): " PREFIX ;;
+            1) scope="global" ;;
+            2) scope="user" ;;
+            3) read -p "  Enter path: " scope ;;
             *) echo "  Invalid choice."; exit 1 ;;
         esac
 
         echo ""
         echo "  Include additional custom folder icons? (y/N)"
-        echo "    These add branded folder icons (GitHub, GitLab, etc.)"
         local folder_choice
         read -p "  (y/N): " folder_choice
         [[ "$folder_choice" =~ ^[Yy]$ ]] && with_folders=true
     fi
 
-    # Summary
     echo ""
     echo "  Summary"
     echo "  -------"
@@ -410,7 +388,7 @@ run_interactive() {
     echo "  Variants: ${variants[*]}"
     if [[ "$mode" == "install" ]]; then
         local path
-        path=$(get_install_path "$PREFIX" "install")
+        path=$(get_install_path "$scope")
         echo "  Location: ${path}"
         [[ "$with_folders" == true ]] && echo "  Custom folders: yes" || echo "  Custom folders: no"
     fi
@@ -419,37 +397,56 @@ run_interactive() {
     [[ ! "$confirm" =~ ^[Yy]$ ]] && { echo "  Cancelled."; exit 0; }
 
     case "$mode" in
-        install)   do_install "$with_folders" "$PREFIX" "${variants[@]}" ;;
-        uninstall) do_uninstall "$PREFIX" ;;
+        install)   do_install "$scope" "$with_folders" "${variants[@]}" ;;
+        uninstall) do_uninstall "$scope" ;;
     esac
 }
 
 # --- Main ---
 
-# No args → interactive
 if [[ $# -eq 0 ]]; then
     run_interactive
     exit 0
 fi
 
-PREFIX=""
+# First pass: determine mode
+# If -i is present anywhere, we're in install mode and -u means user scope
+# Otherwise, -u means uninstall mode
 MODE=""
+for arg in "$@"; do
+    case "$arg" in
+        -i|--install) MODE="install"; break ;;
+    esac
+done
+
+SCOPE="user"
 WITH_FOLDERS=false
 VARIANTS=()
 
 while [[ $# -gt 0 ]]; do
     case $1 in
         -i|--install)     MODE="install"; shift ;;
-        -u|--uninstall)   MODE="uninstall"; shift ;;
         -f|--folders)     WITH_FOLDERS=true; shift ;;
-        -P|--prefix)      PREFIX="$2"; shift 2 ;;
-        -P=*|--prefix=*)  PREFIX="${1#*=}"; shift ;;
         -l|--list)        echo "Available variants: ${ALL_VARIANTS[*]}"; exit 0 ;;
         -h|--help)        show_help; exit 0 ;;
         -*)
-            echo "Unknown option: $1"
-            echo "Use -h or --help for usage information."
-            exit 1 ;;
+            if [ "$MODE" = "install" ]; then
+                # Install-mode flags
+                case $1 in
+                    -u|--user)        SCOPE="user"; shift ;;
+                    -g|--global)      SCOPE="global"; shift ;;
+                    -p|--path)        SCOPE="$2"; shift 2 ;;
+                    -p=*|--path=*)    SCOPE="${1#*=}"; shift ;;
+                    -u|--uninstall)   echo "Cannot use --uninstall with --install."; exit 1 ;;
+                    *)                echo "Unknown option: $1"; echo "Use -h or --help for usage information."; exit 1 ;;
+                esac
+            else
+                case $1 in
+                    -u|--uninstall)   MODE="uninstall"; shift ;;
+                    *)                echo "Unknown option: $1"; echo "Use -h or --help for usage information."; exit 1 ;;
+                esac
+            fi
+            ;;
         *)
             VARIANTS+=("$1"); shift ;;
     esac
@@ -463,8 +460,8 @@ for v in "${VARIANTS[@]}"; do
 done
 
 case "$MODE" in
-    install)   do_install "$WITH_FOLDERS" "$PREFIX" "${VARIANTS[@]}" ;;
-    uninstall) do_uninstall "$PREFIX" ;;
+    install)   do_install "$SCOPE" "$WITH_FOLDERS" "${VARIANTS[@]}" ;;
+    uninstall) do_uninstall "$SCOPE" ;;
 esac
 
 exit 0
