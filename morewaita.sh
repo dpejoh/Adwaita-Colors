@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -euo pipefail
+set -uo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "${SCRIPT_DIR}/variants.conf"
@@ -75,8 +75,13 @@ for variant in "$ADWAITACOLORSDIR"/Adwaita-*; do
 
     # 1. Patch Inherits chain to MoreWaita first
     if [ -f "$theme_file" ]; then
-        sed -i 's/^Inherits=.*/Inherits=MoreWaita,Adwaita,AdwaitaLegacy,hicolor/' "$theme_file"
-        echo "  Inherits: MoreWaita,Adwaita,AdwaitaLegacy,hicolor"
+        if grep -q 'Adwaita-blue' "$theme_file"; then
+            sed -i 's/^Inherits=.*/Inherits=MoreWaita,Adwaita,Adwaita-blue,AdwaitaLegacy,hicolor/' "$theme_file"
+            echo "  Inherits: MoreWaita,Adwaita,Adwaita-blue,AdwaitaLegacy,hicolor"
+        else
+            sed -i 's/^Inherits=.*/Inherits=MoreWaita,Adwaita,AdwaitaLegacy,hicolor/' "$theme_file"
+            echo "  Inherits: MoreWaita,Adwaita,AdwaitaLegacy,hicolor"
+        fi
     fi
 
     # 2. Move specified Adwaita SVGs to mimes/ and replace with MoreWaita's

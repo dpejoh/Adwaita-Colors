@@ -270,6 +270,18 @@ do_install() {
         _run_as "$install_path" cp -r "$src" "$install_path/"
     done
 
+    # Set colored folder icons for each variant directory in the file manager
+    if command -v gio &> /dev/null; then
+        for variant in "${variants[@]}"; do
+            local variant_dir="$install_path/Adwaita-${variant}"
+            local folder_svg="$variant_dir/scalable/places/folder.svg"
+            if [ -f "$folder_svg" ]; then
+                _run_as "$variant_dir" gio set -t string "$variant_dir" \
+                    metadata::custom-icon "file://${folder_svg}" 2>/dev/null || true
+            fi
+        done
+    fi
+
     rm -rf "${SCRIPT_DIR}"/Adwaita-*
     update_icon_cache "$install_path"
     echo "Installation complete."
